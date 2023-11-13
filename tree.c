@@ -57,79 +57,88 @@ int rollDie(int lower, int upper)
 
 struct deltas getDelta(struct branch branch)
 {
-    int height, width, y, x, life, type;
+    int height, width, y, x, life;
     getmaxyx(stdscr, height, width);
     y = branch.y;
     x = branch.y;
     life = branch.life;
-    type = branch.type;
+    // type = branch.type;
     struct deltas returnDeltas = {0, 0};
     int xroll, yroll;
-    xroll = rollDie(1, 10);
+    xroll = rollDie(1, 15);
     yroll = rollDie(1, 10);
-
-    switch (type)
+    if (life == young)
     {
-    case trunk:
-        if (life == young)
+        // modify dx
+        if (xroll <= 5)
         {
-            // modify dx
-            if (xroll <= 5)
-            {
-                returnDeltas.dx++;
-            }
-            else if (xroll <= 10)
-            {
-                returnDeltas.dx--;
-            }
-            // modify dy
-            if (yroll <= 3) // 3/10 chance height gets raised
-            {
-                returnDeltas.dy++;
-            }
+            returnDeltas.dx++;
         }
-        else if (life == middle)
+        else if (xroll <= 10)
         {
+            returnDeltas.dx--;
         }
-        else if (life == old)
+        // modify dy
+        if (yroll <= 3)
         {
+            returnDeltas.dy++;
         }
+    }
+    else if (life == middle)
+    {
+        // modify dx
+        if (xroll <= 5)
+        {
+            returnDeltas.dx++;
+        }
+        else if (xroll <= 10)
+        {
+            returnDeltas.dx--;
+        }
+        // modify dy
+        if (yroll <= 7)
+        {
+            returnDeltas.dy++;
+        }
+    }
+    else if (life == old)
+    {
+        // modify dx
+        if (xroll <= 5)
+        {
+            returnDeltas.dx++;
+        }
+        else if (xroll <= 10)
+        {
+            returnDeltas.dx--;
+        }
+        // modify dy
+        if (yroll <= 1)
+        {
+            returnDeltas.dy++;
+        }
+    }
     // TODO - other cases
-    case right:
-        if (life == young)
+
+    // don't allow a 0, 0 delta (other than edge cases)
+    if (returnDeltas.dx == 0 && returnDeltas.dy == 0)
+    {
+        int randDie = rollDie(1, 4);
+        if (randDie <= 1)
         {
-            if (xroll <= 6)
-            {
-                returnDeltas.dx++;
-            }
-            else if (xroll <= 8)
-            {
-                returnDeltas.dx--;
-            }
+            returnDeltas.dx++;
         }
-        else if (life == middle)
+        else if (randDie <= 2)
         {
+            returnDeltas.dx--;
         }
-        else if (life == old)
+        else if (randDie <= 3)
         {
+            returnDeltas.dy++;
         }
-    case left:
-        if (life == young)
+        else
         {
-            if (xroll <= 6)
-            {
-                returnDeltas.dx--;
-            }
-            else if (xroll <= 8)
-            {
-                returnDeltas.dx++;
-            }
-        }
-        else if (life == middle)
-        {
-        }
-        else if (life == old)
-        {
+            returnDeltas.dy--;
         }
     }
 
@@ -222,6 +231,10 @@ void grow(WINDOW *win, struct branch *branch)
 
     // determine dy, and dx, and type;
     struct deltas deltas = getDelta(*branch);
+    if (deltas.dx == 0 && deltas.dy == 0)
+    {
+        return;
+    }
     int newType = getNewType(deltas);
 
     // recursively branch
