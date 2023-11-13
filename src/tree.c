@@ -55,6 +55,39 @@ int rollDie(int lower, int upper)
     return rand() & (upper - lower + 1);
 }
 
+/* Given a list of currently occupied neighbors, return a list of all the remaining free deltas */
+struct deltas *getFreeNeighbors(struct deltas *neighborDelta, int n)
+{
+    // size of free list will be 8 - size of currently found neighbors
+    struct deltas *FreeDeltas = malloc((8 - n) * sizeof(struct deltas));
+    int currIdx = 0;
+    for (int i = -1; i <= 1; i++) // y
+    {
+        for (int j = -1; j <= 1; j++) // x
+        {
+            if (i == 0 && j == 0)
+                continue;
+            int inNeighors = FALSE;
+            for (int k = 0; k < n; k++)
+            {
+                // check to see if this delta is in the list
+                if (neighborDelta[k].dy == i && neighborDelta[k].dx == j)
+                {
+                    inNeighors = TRUE;
+                    break;
+                }
+            }
+            if (!inNeighors)
+            {
+                FreeDeltas[currIdx].dy = i;
+                FreeDeltas[currIdx].dx = j;
+                currIdx++;
+            }
+        }
+    }
+    return FreeDeltas;
+}
+
 struct deltas getDelta(WINDOW *win, struct branch branch)
 {
     int height, width, y, x, life;
@@ -122,10 +155,16 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     // check for collisions
     int newy = branch.y + returnDeltas.dy;
     int newx = branch.x + returnDeltas.dx;
-    int collision = checkCollision(win, newy, newx);
-    while (collision)
+    if (checkCollision(win, newy, newx))
     {
-        // randomly change dx dy until there is no collision
+        // if the new spot will have a collision, choose a random spot not occupied by neighbors
+        int n = 0;
+        struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
+        struct deltas *freeNeighbors = getFreeNeighbors(win, neighborDelta);
+        int freeSize = 8 - n;
+        int pickRoll = rollDie(0, freeSize - 1);
+        returnDeltas.dy = freeNeighbors[pickRoll].dy;
+        returnDeltas.dx = freeNeighbors[pickRoll].dx;
     }
 
     // don't allow a 0, 0 delta (other than edge cases)
@@ -225,7 +264,7 @@ int checkCollision(WINDOW *win, int y, int x)
 {
     chtype ch = mvwinch(win, y, x);
     char character = (char)(ch & A_CHARTEXT);
-    wprintw(win, "Character grabbed: %c from coords: %d %d\n", character, y, x);
+    // wprintw(win, "Character grabbed: %c from coords: %d %d\n", character, y, x);
     if (character != ' ')
     {
         return TRUE;
@@ -234,27 +273,28 @@ int checkCollision(WINDOW *win, int y, int x)
 }
 
 /* Check all 8 surrounding coordinates to see if there are any collions that could happen from branching */
-struct deltas *getNeighbors(WINDOW *win, int y, int x)
+struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n)
 {
     struct deltas *collisions = NULL;
-    int n = 0;
     for (int i = -1; i <= 1; i++) // will represent y deltas
     {
         for (int j = -1; j <= 1; j++) // will represent x deltas
         {
             if (i == 0 && j == 0) // don't check for collision on self
                 continue;
-            if (checkCollision(win, y + i, x + j))
+            int collision = checkCollision(win, y + i, x + j);
+            if (collision)
             {
-                n++;
-                collisions = realloc(collisions, n * sizeof(struct deltas));
+                *n = *n + 1;
+                collisions = realloc(collisions, *n * sizeof(struct deltas));
                 if (collisions == NULL)
                 {
                     endwin();
                     exit(EXIT_FAILURE);
                 }
-                struct deltas newDelta = {i, j};
-                collisions[n - 1] = newDelta;
+                // struct deltas newDelta = {i, j};
+                collisions[*n - 1].dy = i;
+                collisions[*n - 1].dx = j;
             }
         }
     }

@@ -56,7 +56,8 @@ int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
 int getNewType(struct deltas deltas);
 int checkCollision(WINDOW *win, int y, int x);
-struct deltas *getNeighbors(WINDOW *win, int y, int x);
+struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
+struct deltas *getFreeNeighbors(struct deltas *neighborDeltas, int n);
 void grow(WINDOW *win, struct branch *branch);
 
 // debug functions

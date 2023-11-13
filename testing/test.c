@@ -37,8 +37,9 @@ int testGetNeighbors()
     mvaddch(1, 1, 'c');
     mvaddch(1, 2, 'c');
     mvaddch(1, 3, 'c');
+    int n = 0;
 
-    struct deltas *neighbors = getNeighbors(stdscr, 2, 2);
+    struct deltas *neighbors = getNeighbors(stdscr, 2, 2, &n);
 
     // check to see they are of the correct values (-1, (-1,0,1))
     if (neighbors[0].dy != -1 || neighbors[0].dx != -1)
@@ -66,6 +67,31 @@ int testGetNeighbors()
     return TRUE;
 }
 
+int testGetFreeNeighbors()
+{
+    initscr();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    mvaddch(1, 1, 'c');
+    mvaddch(1, 2, 'c');
+    mvaddch(1, 3, 'c');
+    int n = 0;
+    refresh();
+
+    struct deltas *neighbors = getNeighbors(stdscr, 2, 2, &n);
+    struct deltas *freeSpots = getFreeNeighbors(neighbors, n);
+    endwin();
+
+    // MANUAL CHECK FOR DELTAS
+    printf("n value %d\n", n);
+    for (int i = 0; i < (8 - n); i++)
+    {
+        printf("free spot dy, dx: %d, %d\n", freeSpots[i].dy, freeSpots[i].dx);
+    }
+    return TRUE;
+}
+
 int main()
 {
     if (!testCheckCollision())
@@ -73,5 +99,8 @@ int main()
 
     if (!testGetNeighbors())
         printf("testGetNeighbors failed\n");
+
+    if (!testGetFreeNeighbors())
+        printf("testGetFreeNeighbors failed\n");
     return 0;
 }
