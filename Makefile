@@ -3,13 +3,17 @@ CFLAGS = -Wall
 LIBS = -lncurses
 INCLUDE = -I./include
 
-all: tree test
+SRC_DIR = src
+TEST_DIR = testing
+BIN_DIR = bin
 
-tree: src/tree.c
-	$(CC) $(CFLAGS) $< -o bin/$@ $(LIBS) $(INCLUDE)
+all: main test
 
-test: testing/test.c tree
-	$(CC) $(CFLAGS) $< -o bin/$@ bin/tree $(LIBS) $(INCLUDE)
+main: $(SRC_DIR)/main.c $(SRC_DIR)/tree.c
+	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/$@ $(LIBS) $(INCLUDE)
+
+test: $(TEST_DIR)/test.c $(SRC_DIR)/tree.c
+	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/$@ $(LIBS) $(INCLUDE)
 
 clean:
-	rm -f bin/* *.o
+	rm -f $(BIN_DIR)/* *.o
