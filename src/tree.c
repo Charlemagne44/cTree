@@ -55,7 +55,7 @@ int rollDie(int lower, int upper)
     return rand() & (upper - lower + 1);
 }
 
-struct deltas getDelta(struct branch branch)
+struct deltas getDelta(WINDOW *win, struct branch branch)
 {
     int height, width, y, x, life;
     getmaxyx(stdscr, height, width);
@@ -118,7 +118,15 @@ struct deltas getDelta(struct branch branch)
             returnDeltas.dy++;
         }
     }
-    // TODO - other cases
+
+    // check for collisions
+    int newy = branch.y + returnDeltas.dy;
+    int newx = branch.x + returnDeltas.dx;
+    int collision = checkCollision(win, newy, newx);
+    while (collision)
+    {
+        // randomly change dx dy until there is no collision
+    }
 
     // don't allow a 0, 0 delta (other than edge cases)
     if (returnDeltas.dx == 0 && returnDeltas.dy == 0)
@@ -212,12 +220,48 @@ int getNewType(struct deltas deltas)
     }
 }
 
+/* Check to see if a character is already printed at the new branch coordinates */
+int checkCollision(WINDOW *win, int y, int x)
+{
+    chtype ch = mvwinch(win, y, x);
+    char character = (char)(ch & A_CHARTEXT);
+    wprintw(win, "Character grabbed: %c from coords: %d %d\n", character, y, x);
+    if (character != ' ')
+    {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+/* Check all 8 surrounding coordinates to see if there are any collions that could happen from branching */
+struct deltas *getNeighbors(WINDOW *win, int y, int x)
+{
+    struct deltas *collisions;
+    int n = 0;
+    for (int i = -1; i <= 1; i++) // will represent y deltas
+    {
+        for (int j = -1; j <= 1; j++) // will represent x deltas
+        {
+            if (i == 0 && j == 0) // don't check for collision on self
+                continue;
+            if (checkCollision(win, y + i, x + j))
+            {
+                n++;
+                collisions = realloc(collisions, n * sizeof(struct deltas));
+                struct deltas newDelta = {i, j};
+                collisions[n - 1] = newDelta;
+            }
+        }
+    }
+    return collisions;
+}
+
 void grow(WINDOW *win, struct branch *branch)
 {
     // render current branch;
     mvwprintw(win, branch->y, branch->x, branch->character);
     wrefresh(win);
-    // getch();
+    getch();
 
     // if dead, run leaf probability and then return
     if (branch->life == dead)
@@ -230,7 +274,7 @@ void grow(WINDOW *win, struct branch *branch)
     }
 
     // determine dy, and dx, and type;
-    struct deltas deltas = getDelta(*branch);
+    struct deltas deltas = getDelta(win, *branch);
     if (deltas.dx == 0 && deltas.dy == 0)
     {
         return;
@@ -296,15 +340,15 @@ void start(struct ncursesObjects *objects)
     grow(objects->treewin, branch);
 }
 
-int main()
-{
-    struct ncursesObjects objects;
-    init(&objects);
-    refresh();
+// int main()
+// {
+//     struct ncursesObjects objects;
+//     init(&objects);
+//     refresh();
 
-    start(&objects);
+//     start(&objects);
 
-    getch();
-    cleanup(&objects);
-    return 0;
-}
+//     getch();
+//     cleanup(&objects);
+//     return 0;
+// }

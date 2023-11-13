@@ -53,8 +53,10 @@ void cleanup(struct ncursesObjects *objects);
 void start(struct ncursesObjects *objects);
 char getCharacter(struct branch branch);
 int rollDie(int lower, int upper);
-struct deltas getDelta(struct branch branch);
+struct deltas getDelta(WINDOW *win, struct branch branch);
 int getNewType(struct deltas deltas);
+int checkCollision(WINDOW *win, int y, int x);
+struct deltas *getNeighbors(WINDOW *win, int y, int x);
 void grow(WINDOW *win, struct branch *branch);
 
 // debug functions
