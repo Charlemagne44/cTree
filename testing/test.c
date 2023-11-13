@@ -92,15 +92,15 @@ int testGetFreeNeighbors()
     return TRUE;
 }
 
-int main()
-{
-    if (!testCheckCollision())
-        printf("testCheckCollision Failed\n");
+// int main()
+// {
+//     if (!testCheckCollision())
+//         printf("testCheckCollision Failed\n");
 
-    if (!testGetNeighbors())
-        printf("testGetNeighbors failed\n");
+//     if (!testGetNeighbors())
+//         printf("testGetNeighbors failed\n");
 
-    if (!testGetFreeNeighbors())
-        printf("testGetFreeNeighbors failed\n");
-    return 0;
-}
+//     if (!testGetFreeNeighbors())
+//         printf("testGetFreeNeighbors failed\n");
+//     return 0;
+// }

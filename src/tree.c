@@ -158,38 +158,17 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     if (checkCollision(win, newy, newx))
     {
         // if the new spot will have a collision, choose a random spot not occupied by neighbors
+        // TODO - ENCOURAGE CURRENT TREND OF GROWTH
         int n = 0;
         struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
-        struct deltas *freeNeighbors = getFreeNeighbors(win, neighborDelta);
+        struct deltas *freeNeighbors = getFreeNeighbors(neighborDelta, n);
         int freeSize = 8 - n;
         int pickRoll = rollDie(0, freeSize - 1);
         returnDeltas.dy = freeNeighbors[pickRoll].dy;
         returnDeltas.dx = freeNeighbors[pickRoll].dx;
     }
 
-    // don't allow a 0, 0 delta (other than edge cases)
-    if (returnDeltas.dx == 0 && returnDeltas.dy == 0)
-    {
-        int randDie = rollDie(1, 4);
-        if (randDie <= 1)
-        {
-            returnDeltas.dx++;
-        }
-        else if (randDie <= 2)
-        {
-            returnDeltas.dx--;
-        }
-        else if (randDie <= 3)
-        {
-            returnDeltas.dy++;
-        }
-        else
-        {
-            returnDeltas.dy--;
-        }
-    }
-
-    // rule out deltas that would bring the next branch off screen
+    // rule out deltas that would bring the next branch off screen TODO
     if (x <= 1 && returnDeltas.dx == -1)
     {
         returnDeltas.dx = 0;
@@ -385,15 +364,15 @@ void start(struct ncursesObjects *objects)
     grow(objects->treewin, branch);
 }
 
-// int main()
-// {
-//     struct ncursesObjects objects;
-//     init(&objects);
-//     refresh();
+int main()
+{
+    struct ncursesObjects objects;
+    init(&objects);
+    refresh();
 
-//     start(&objects);
+    start(&objects);
 
-//     getch();
-//     cleanup(&objects);
-//     return 0;
-// }
+    getch();
+    cleanup(&objects);
+    return 0;
+}
