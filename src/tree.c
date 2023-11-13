@@ -236,7 +236,7 @@ int checkCollision(WINDOW *win, int y, int x)
 /* Check all 8 surrounding coordinates to see if there are any collions that could happen from branching */
 struct deltas *getNeighbors(WINDOW *win, int y, int x)
 {
-    struct deltas *collisions;
+    struct deltas *collisions = NULL;
     int n = 0;
     for (int i = -1; i <= 1; i++) // will represent y deltas
     {
@@ -248,6 +248,11 @@ struct deltas *getNeighbors(WINDOW *win, int y, int x)
             {
                 n++;
                 collisions = realloc(collisions, n * sizeof(struct deltas));
+                if (collisions == NULL)
+                {
+                    endwin();
+                    exit(EXIT_FAILURE);
+                }
                 struct deltas newDelta = {i, j};
                 collisions[n - 1] = newDelta;
             }
