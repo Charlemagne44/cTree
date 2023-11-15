@@ -122,8 +122,7 @@ int testGetDelta()
     for (int i = 0; i < 100; i++)
     {
         initscr();
-        int height, width;
-        getmaxyx(stdscr, height, width);
+        int width = getmaxx(stdscr);
         struct branch branch = {
             trunk,
             young,
@@ -146,8 +145,7 @@ int testGetDelta()
     for (int i = 0; i < 100; i++)
     {
         initscr();
-        int height, width;
-        getmaxyx(stdscr, height, width);
+        int height = getmaxy(stdscr);
         struct branch branch = {
             trunk,
             young,

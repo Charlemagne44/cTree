@@ -121,6 +121,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         left = TRUE;
     }
 
+    // TODO - Encourage growth based upon branch type
     if (life == young)
     {
         // modify dx
