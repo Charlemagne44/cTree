@@ -94,7 +94,7 @@ int testGetFreeNeighbors()
 
 int testGetDelta()
 {
-    // run 100 iterations of getting the delta for the starting trunks
+    // check deltas for bottom edge
     for (int i = 0; i < 100; i++)
     {
         initscr();
@@ -108,7 +108,6 @@ int testGetDelta()
             "~",
         };
         struct deltas deltas = getDelta(stdscr, branch);
-        // check to make sure delta does not go under the screen
         if (deltas.dy > 0)
         {
             endwin();
@@ -117,7 +116,78 @@ int testGetDelta()
         }
 
         endwin();
-        printf("returned deltas (dy, dx): (%d, %d)\n", deltas.dy, deltas.dx);
+    }
+
+    // check deltas for top edge
+    for (int i = 0; i < 100; i++)
+    {
+        initscr();
+        int height, width;
+        getmaxyx(stdscr, height, width);
+        struct branch branch = {
+            trunk,
+            young,
+            width / 2,
+            1,
+            "~",
+        };
+        struct deltas deltas = getDelta(stdscr, branch);
+        if (deltas.dy < 0)
+        {
+            endwin();
+            printf("bad delta (dy, dx): (%d, %d) on iteration: %d\n", deltas.dy, deltas.dx, i);
+            return FALSE;
+        }
+
+        endwin();
+    }
+
+    // check deltas for left edge
+    for (int i = 0; i < 100; i++)
+    {
+        initscr();
+        int height, width;
+        getmaxyx(stdscr, height, width);
+        struct branch branch = {
+            trunk,
+            young,
+            1,
+            height / 2,
+            "~",
+        };
+        struct deltas deltas = getDelta(stdscr, branch);
+        if (deltas.dx < 0)
+        {
+            endwin();
+            printf("bad delta (dy, dx): (%d, %d) on iteration: %d\n", deltas.dy, deltas.dx, i);
+            return FALSE;
+        }
+
+        endwin();
+    }
+
+    // check deltas for right edge
+    for (int i = 0; i < 100; i++)
+    {
+        initscr();
+        int height, width;
+        getmaxyx(stdscr, height, width);
+        struct branch branch = {
+            trunk,
+            young,
+            width - 1,
+            height / 2,
+            "~",
+        };
+        struct deltas deltas = getDelta(stdscr, branch);
+        if (deltas.dx > 0)
+        {
+            endwin();
+            printf("bad delta (dy, dx): (%d, %d) on iteration: %d\n", deltas.dy, deltas.dx, i);
+            return FALSE;
+        }
+
+        endwin();
     }
 
     return TRUE;
