@@ -58,6 +58,7 @@ int getNewType(struct deltas deltas);
 int checkCollision(WINDOW *win, int y, int x);
 struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
 struct deltas *getFreeNeighbors(struct deltas *neighborDeltas, int n);
+struct branch *createNewBranch(int life, int type, struct deltas deltas, struct branch *branch);
 void grow(WINDOW *win, struct branch *branch);
 
 // debug functions

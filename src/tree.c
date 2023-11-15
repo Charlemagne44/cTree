@@ -284,6 +284,21 @@ struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n)
     return collisions;
 }
 
+struct branch *createNewBranch(int life, int type, struct deltas deltas, struct branch *branch)
+{
+    struct branch *newBranch = malloc(sizeof(struct branch));
+    newBranch->life = young;
+    newBranch->type = type;
+    newBranch->x = branch->x + deltas.dx;
+    newBranch->y = branch->y + deltas.dy;
+    char newStr[2];
+    newStr[0] = getCharacter(*newBranch);
+    newStr[1] = '\0';
+    newBranch->character = newStr;
+
+    return newBranch;
+}
+
 void grow(WINDOW *win, struct branch *branch)
 {
     // render current branch;
@@ -320,16 +335,7 @@ void grow(WINDOW *win, struct branch *branch)
     case young:
         if (branchRoll < 9) // 9/10 chance to grow a young branch
         {
-            struct branch *newBranch = malloc(sizeof(struct branch));
-            newBranch->life = young;
-            newBranch->type = newType;
-            newBranch->x = branch->x + deltas.dx;
-            newBranch->y = branch->y + deltas.dy;
-            char newStr[2];
-            newStr[0] = getCharacter(*newBranch);
-            newStr[1] = '\0';
-            newBranch->character = newStr;
-
+            struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
     case middle:
