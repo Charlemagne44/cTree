@@ -191,6 +191,23 @@ int testGetDelta()
     return TRUE;
 }
 
+int testRollDie()
+{
+    // run large iteration of die rolls to make sure they do not leave their bounds
+    int lower = 1;
+    int upper = 5;
+    for (int i = 0; i < 200; i++)
+    {
+        int die = rollDie(lower, upper);
+        if (die < lower || die > upper)
+        {
+            printf("die left range with roll %d\n", die);
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
 /* Run all the tests without assertions that reqiure looking at the output */
 void runManualTests()
 {
@@ -200,6 +217,9 @@ void runManualTests()
 
 int main()
 {
+    // seed for each run of testing for randomization
+    srand(time(0));
+
     if (!testCheckCollision())
         printf("testCheckCollision Failed\n");
 
@@ -208,6 +228,9 @@ int main()
 
     if (!testGetDelta())
         printf("testGetDelta failed\n");
+
+    if (!testRollDie())
+        printf("testRollDie failed\n");
 
     // comment out too avoid manual tests
     // runManualTests();

@@ -52,7 +52,7 @@ char getCharacter(struct branch branch)
 
 int rollDie(int lower, int upper)
 {
-    return rand() & (upper - lower + 1);
+    return (rand() % (upper - lower + 1)) + lower;
 }
 
 /* Given a list of currently occupied neighbors, return a list of all the remaining free deltas */
@@ -324,22 +324,28 @@ void grow(WINDOW *win, struct branch *branch)
     }
     int newType = getNewType(deltas);
 
-    // recursively branch
-    // int height, width;
-    // getmaxyx(stdscr, height, width);
+    // grow the branches based upon age TODO - OTHER AGES
     int branchRoll = rollDie(1, 10);
-    // int ageMultiplier = (dead - (branch->type)); // 3 is the max multipler (young), 1 is the lowest (old)
-    // int heightPercentage = (1.0 - ((float)branch->y / (float)height));
     switch (branch->life)
     {
     case young:
-        if (branchRoll < 9) // 9/10 chance to grow a young branch
+        if (branchRoll <= 9) // 9/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
     case middle:
+        if (branchRoll <= 6) // 6/10 chance to grow a young branch
+        {
+            struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
+            grow(win, newBranch);
+        }
     case old:
+        if (branchRoll <= 3) // 3/10 chance to grow a young branch
+        {
+            struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
+            grow(win, newBranch);
+        }
     case dead:
     }
 
