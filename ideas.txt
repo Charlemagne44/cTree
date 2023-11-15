@@ -1,0 +1,4 @@
+weather patterns
+    - wind blowing which moves branches
+    - knocks off leaves?
+

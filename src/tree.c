@@ -132,8 +132,8 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         {
             returnDeltas.dx--;
         }
-        // modify dy
-        if (yroll <= 3 && !top)
+        // modify dy - > Force young branches up
+        if (!top)
         {
             returnDeltas.dy--;
         }
@@ -141,21 +141,21 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     else if (life == middle)
     {
         // modify dx
-        if (xroll <= 5 && !right)
+        if (xroll <= 7 && !right)
         {
             returnDeltas.dx++;
         }
-        else if (xroll <= 10 && !left)
+        else if (xroll <= 15 && !left)
         {
             returnDeltas.dx--;
         }
         // modify dy
-        if (yroll <= 7 && !top)
+        if (yroll <= 7 && !top) // middle aged branches likely to go up
         {
             returnDeltas.dy--;
         }
     }
-    else if (life == old)
+    else if (life == old) //
     {
         // modify dx
         if (xroll <= 5 && !right)
@@ -167,7 +167,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
             returnDeltas.dx--;
         }
         // modify dy
-        if (yroll <= 1)
+        if (yroll <= 3 && !top)
         {
             returnDeltas.dy--;
         }
@@ -178,16 +178,28 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     int newx = branch.x + returnDeltas.dx;
     if (checkCollision(win, newy, newx))
     {
-        // if the new spot will have a collision, choose a random spot not occupied by neighbors
+        // if the new spot will have a collision, have a chance to choose a random spot of free neighbors
+        // else -> return 0, 0 to discourage more branching
+        // older branches higher off the ground should have a higher probability of searching for free neighbors
         // TODO - ENCOURAGE CURRENT TREND OF GROWTH
         // TODO - PREVENT BOTTOMING OUT
-        int n = 0;
-        struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
-        struct deltas *freeNeighbors = getFreeNeighbors(neighborDelta, n);
-        int freeSize = 8 - n;
-        int pickRoll = rollDie(0, freeSize - 1);
-        returnDeltas.dy = freeNeighbors[pickRoll].dy;
-        returnDeltas.dx = freeNeighbors[pickRoll].dx;
+        int heightMultiplier = 1.0 + (1.0 - ((float)branch.y / (float)height));
+        int ageMultipier = 1.0 + (1.0 / (1 + branch.life));
+        if (rollDie(1, 10) * ageMultipier * heightMultiplier <= 5.0)
+        {
+            int n = 0;
+            struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
+            struct deltas *freeNeighbors = getFreeNeighbors(neighborDelta, n);
+            int freeSize = 8 - n;
+            int pickRoll = rollDie(0, freeSize - 1);
+            returnDeltas.dy = freeNeighbors[pickRoll].dy;
+            returnDeltas.dx = freeNeighbors[pickRoll].dx;
+        }
+        else
+        {
+            returnDeltas.dy = 0;
+            returnDeltas.dx = 0;
+        }
     }
 
     return returnDeltas;
@@ -307,15 +319,19 @@ void grow(WINDOW *win, struct branch *branch)
     {
         napms(SLEEP_MILLISECONDS);
     }
+
     // render current branch;
     mvwprintw(win, branch->y, branch->x, branch->character);
     wrefresh(win);
     // if dead, run leaf probability and then return
     if (branch->life == dead)
     {
-        if (branch->type != trunk)
+        if (branch->type != trunk && branch->type != up && branch->type != left && branch->type != right)
         {
             // TODO - leaf logic
+            branch->character = "&";
+            mvwprintw(win, branch->y, branch->x, branch->character);
+            wrefresh(win);
         }
         return;
     }
@@ -360,8 +376,11 @@ void grow(WINDOW *win, struct branch *branch)
     // increment age and decrement life
     branch->life++;
 
-    // grow again if not dead
-    grow(win, branch);
+    // roll a chance to grow again if not dead
+    if (rollDie(1, 10) <= 4)
+    {
+        grow(win, branch);
+    }
 }
 
 void start(struct ncursesObjects *objects)
