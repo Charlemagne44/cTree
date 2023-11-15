@@ -54,7 +54,7 @@ struct deltas
 void init(struct ncursesObjects *objects);
 void cleanup(struct ncursesObjects *objects);
 void start(struct ncursesObjects *objects);
-char getCharacter(struct branch branch);
+char getCharacter(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
 int getNewType(struct deltas deltas);

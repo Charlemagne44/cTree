@@ -27,9 +27,8 @@ void makeBoxes(struct ncursesObjects *objects)
     wrefresh(objects->treewin);
 }
 
-char getCharacter(struct branch branch)
+char getCharacter(enum branchType type)
 {
-    int type = branch.type;
     switch (type)
     {
     case trunk:
@@ -292,7 +291,7 @@ struct branch *createNewBranch(int life, int type, struct deltas deltas, struct 
     newBranch->x = branch->x + deltas.dx;
     newBranch->y = branch->y + deltas.dy;
     char newStr[2];
-    newStr[0] = getCharacter(*newBranch);
+    newStr[0] = getCharacter(type);
     newStr[1] = '\0';
     newBranch->character = newStr;
 
@@ -379,7 +378,7 @@ void start(struct ncursesObjects *objects)
     branch->x = (width / 2);
 
     char str[2];
-    str[0] = getCharacter(*branch);
+    str[0] = getCharacter(branch->type);
     str[1] = '\0';
     branch->character = str;
 

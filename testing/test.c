@@ -208,6 +208,57 @@ int testRollDie()
     return TRUE;
 }
 
+int testGetCharacter()
+{
+    initscr();
+    int height, width;
+    getmaxyx(stdscr, height, width);
+    endwin();
+
+    // up left and down right
+    char str[2];
+    str[0] = getCharacter(upLeft);
+    str[1] = '\0';
+
+    if (strcmp(str, "\\") != 0)
+    {
+        printf("Wrong character: %s\n", str);
+        return FALSE;
+    }
+
+    // up right and down left
+    str[0] = getCharacter(upRight);
+    str[1] = '\0';
+
+    if (strcmp(str, "/") != 0)
+    {
+        printf("Wrong character: %s\n", str);
+        return FALSE;
+    }
+
+    // up and down
+    str[0] = getCharacter(up);
+    str[1] = '\0';
+
+    if (strcmp(str, "|") != 0)
+    {
+        printf("Wrong character: %s\n", str);
+        return FALSE;
+    }
+
+    // left and rights
+    str[0] = getCharacter(left);
+    str[1] = '\0';
+
+    if (strcmp(str, "-") != 0)
+    {
+        printf("Wrong character: %s\n", str);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 /* Run all the tests without assertions that reqiure looking at the output */
 void runManualTests()
 {
@@ -231,6 +282,9 @@ int main()
 
     if (!testRollDie())
         printf("testRollDie failed\n");
+
+    if (!testGetCharacter())
+        printf("testGetCharacter failed\n");
 
     // comment out too avoid manual tests
     // runManualTests();
