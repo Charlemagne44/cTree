@@ -92,6 +92,13 @@ int testGetFreeNeighbors()
     return TRUE;
 }
 
+/* Run all the tests without assertions that reqiure looking at the output */
+void runManualTests()
+{
+    if (!testGetFreeNeighbors())
+        printf("testGetFreeNighbors failed\n");
+}
+
 int main()
 {
     if (!testCheckCollision())
@@ -100,7 +107,7 @@ int main()
     if (!testGetNeighbors())
         printf("testGetNeighbors failed\n");
 
-    if (!testGetFreeNeighbors())
-        printf("testGetFreeNeighbors failed\n");
+    // comment out too avoid manual tests
+    runManualTests();
     return 0;
 }
