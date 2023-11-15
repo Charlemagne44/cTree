@@ -210,11 +210,6 @@ int testRollDie()
 
 int testGetCharacter()
 {
-    initscr();
-    int height, width;
-    getmaxyx(stdscr, height, width);
-    endwin();
-
     // up left and down right
     char str[2];
     str[0] = getCharacter(upLeft);
@@ -259,6 +254,84 @@ int testGetCharacter()
     return TRUE;
 }
 
+int testGetNewType()
+{
+    // tests will go clockwise -> up, upright, right, downright etc.
+    // up
+    struct deltas deltas = {-1, 0};
+    enum branchType type = getNewType(deltas);
+    if (type != up)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = -1;
+    deltas.dx = 1;
+    type = getNewType(deltas);
+    if (type != upRight)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = 0;
+    deltas.dx = 1;
+    type = getNewType(deltas);
+    if (type != right)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = 1;
+    deltas.dx = 1;
+    type = getNewType(deltas);
+    if (type != downRight)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = 1;
+    deltas.dx = 0;
+    type = getNewType(deltas);
+    if (type != down)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = 1;
+    deltas.dx = -1;
+    type = getNewType(deltas);
+    if (type != downLeft)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = 0;
+    deltas.dx = -1;
+    type = getNewType(deltas);
+    if (type != left)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    deltas.dy = -1;
+    deltas.dx = -1;
+    type = getNewType(deltas);
+    if (type != upLeft)
+    {
+        printf("Wrong branch type: %d\n", type);
+        return FALSE;
+    }
+
+    return TRUE;
+}
+
 /* Run all the tests without assertions that reqiure looking at the output */
 void runManualTests()
 {
@@ -285,6 +358,9 @@ int main()
 
     if (!testGetCharacter())
         printf("testGetCharacter failed\n");
+
+    if (!testGetNewType())
+        printf("testGetNewType failed\n");
 
     // comment out too avoid manual tests
     // runManualTests();

@@ -4,6 +4,9 @@
 #include <ncurses.h>
 #include <time.h>
 
+#ifndef TREE_H
+#define TREE_H
+
 #define STARTING_TRUNKS 1
 #define SLEEP_MILLISECONDS 200
 #define SLEEP_BETWEEN_RENDER 1
@@ -66,3 +69,5 @@ void grow(WINDOW *win, struct branch *branch);
 
 // debug functions
 void makeBoxes(struct ncursesObjects *objects);
+
+#endif

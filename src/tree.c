@@ -104,7 +104,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     int top, bottom, left, right = FALSE;
     if (y >= height - 1)
     {
-        bottom = TRUE;
+        bottom = TRUE; // TODO, PREVENT BOTTOMING OUT
     }
     else if (y <= 1)
     {
@@ -180,6 +180,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     {
         // if the new spot will have a collision, choose a random spot not occupied by neighbors
         // TODO - ENCOURAGE CURRENT TREND OF GROWTH
+        // TODO - PREVENT BOTTOMING OUT
         int n = 0;
         struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
         struct deltas *freeNeighbors = getFreeNeighbors(neighborDelta, n);
@@ -213,21 +214,6 @@ int getNewType(struct deltas deltas)
     {
         if (deltas.dx == 0)
         {
-            return down;
-        }
-        else if (deltas.dx < 0)
-        {
-            return downLeft;
-        }
-        else
-        {
-            return downRight;
-        }
-    }
-    else
-    {
-        if (deltas.dx == 0)
-        {
             return up;
         }
         else if (deltas.dx < 0)
@@ -237,6 +223,21 @@ int getNewType(struct deltas deltas)
         else
         {
             return upRight;
+        }
+    }
+    else
+    {
+        if (deltas.dx == 0)
+        {
+            return down;
+        }
+        else if (deltas.dx < 0)
+        {
+            return downLeft;
+        }
+        else
+        {
+            return downRight;
         }
     }
 }
