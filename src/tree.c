@@ -101,7 +101,10 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     yroll = rollDie(1, 10);
 
     // flags to prevent deltas from leaving the screen
-    int top, bottom, left, right = FALSE;
+    int top = FALSE;
+    int bottom = FALSE;
+    int left = FALSE;
+    int right = FALSE;
     if (y >= height - 1)
     {
         bottom = TRUE; // TODO, PREVENT BOTTOMING OUT
@@ -132,8 +135,8 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         {
             returnDeltas.dx--;
         }
-        // modify dy - > Force young branches up
-        if (!top)
+        // modify dy - > Highly encourage young branches up
+        if (yroll <= 8 && !top)
         {
             returnDeltas.dy--;
         }
@@ -205,13 +208,21 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     return returnDeltas;
 }
 
-int getNewType(struct deltas deltas)
+int getNewType(struct deltas deltas, enum branchType parentType)
 {
+    // TODO - create a random chance of another trunk occuring, which has unique growth patterns
+    if (parentType == trunk || parentType == left || parentType == right)
+    {
+        if (rollDie(1, 10) <= 3)
+        {
+            return trunk;
+        }
+    }
     if (deltas.dy == 0)
     {
         if (deltas.dx == 0)
         {
-            return trunk;
+            return trunk; // TODO - impossible , will not happen
         }
         else if (deltas.dx < 0)
         {
@@ -303,6 +314,7 @@ struct branch *createNewBranch(int life, int type, struct deltas deltas, struct 
     newBranch->type = type;
     newBranch->x = branch->x + deltas.dx;
     newBranch->y = branch->y + deltas.dy;
+    newBranch->parentType = branch->type;
     char newStr[2];
     newStr[0] = getCharacter(type);
     newStr[1] = '\0';
@@ -323,10 +335,18 @@ void grow(WINDOW *win, struct branch *branch)
     // render current branch;
     mvwprintw(win, branch->y, branch->x, branch->character);
     wrefresh(win);
+
+    // determine dy, and dx, and type;
+    struct deltas deltas = getDelta(win, *branch);
+    if (deltas.dx == 0 && deltas.dy == 0)
+    {
+        branch->life = dead; // boxed in
+    }
+
     // if dead, run leaf probability and then return
     if (branch->life == dead)
     {
-        if (branch->type != trunk && branch->type != up && branch->type != left && branch->type != right)
+        if (branch->type != trunk)
         {
             // TODO - leaf logic
             branch->character = "&";
@@ -336,20 +356,19 @@ void grow(WINDOW *win, struct branch *branch)
         return;
     }
 
-    // determine dy, and dx, and type;
-    struct deltas deltas = getDelta(win, *branch);
-    if (deltas.dx == 0 && deltas.dy == 0)
-    {
-        return;
-    }
-    int newType = getNewType(deltas);
+    int newType = getNewType(deltas, branch->type);
 
     // grow the branches based upon age TODO - OTHER AGES
     int branchRoll = rollDie(1, 10);
     switch (branch->life)
     {
     case young:
-        if (branchRoll <= 9) // 9/10 chance to grow a young branch
+        if (branch->type == trunk) // young trunk -> 100% growth chance
+        {
+            struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
+            grow(win, newBranch);
+        }
+        else if (branchRoll <= 9) // 9/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
@@ -377,7 +396,7 @@ void grow(WINDOW *win, struct branch *branch)
     branch->life++;
 
     // roll a chance to grow again if not dead
-    if (rollDie(1, 10) <= 4)
+    if (rollDie(1, 10) <= 6 && branch->life != dead)
     {
         grow(win, branch);
     }
@@ -396,6 +415,7 @@ void start(struct ncursesObjects *objects)
     branch->type = trunk;
     branch->y = height - 1;
     branch->x = (width / 2);
+    branch->parentType = trunk;
 
     char str[2];
     str[0] = getCharacter(branch->type);

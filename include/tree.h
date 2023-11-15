@@ -39,6 +39,7 @@ struct branch
     enum life life;
     int x, y;
     char *character;
+    enum branchType parentType;
 };
 
 struct ncursesObjects
@@ -60,7 +61,7 @@ void start(struct ncursesObjects *objects);
 char getCharacter(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
-int getNewType(struct deltas deltas);
+int getNewType(struct deltas deltas, enum branchType parentType);
 int checkCollision(WINDOW *win, int y, int x);
 struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
 struct deltas *getFreeNeighbors(struct deltas *neighborDeltas, int n);

@@ -259,7 +259,8 @@ int testGetNewType()
     // tests will go clockwise -> up, upright, right, downright etc.
     // up
     struct deltas deltas = {-1, 0};
-    enum branchType type = getNewType(deltas);
+    enum branchType parentDummy = up;
+    enum branchType type = getNewType(deltas, parentDummy);
     if (type != up)
     {
         printf("Wrong branch type: %d\n", type);
@@ -268,7 +269,7 @@ int testGetNewType()
 
     deltas.dy = -1;
     deltas.dx = 1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != upRight)
     {
         printf("Wrong branch type: %d\n", type);
@@ -277,7 +278,7 @@ int testGetNewType()
 
     deltas.dy = 0;
     deltas.dx = 1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != right)
     {
         printf("Wrong branch type: %d\n", type);
@@ -286,7 +287,7 @@ int testGetNewType()
 
     deltas.dy = 1;
     deltas.dx = 1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != downRight)
     {
         printf("Wrong branch type: %d\n", type);
@@ -295,7 +296,7 @@ int testGetNewType()
 
     deltas.dy = 1;
     deltas.dx = 0;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != down)
     {
         printf("Wrong branch type: %d\n", type);
@@ -304,7 +305,7 @@ int testGetNewType()
 
     deltas.dy = 1;
     deltas.dx = -1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != downLeft)
     {
         printf("Wrong branch type: %d\n", type);
@@ -313,7 +314,7 @@ int testGetNewType()
 
     deltas.dy = 0;
     deltas.dx = -1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != left)
     {
         printf("Wrong branch type: %d\n", type);
@@ -322,7 +323,7 @@ int testGetNewType()
 
     deltas.dy = -1;
     deltas.dx = -1;
-    type = getNewType(deltas);
+    type = getNewType(deltas, parentDummy);
     if (type != upLeft)
     {
         printf("Wrong branch type: %d\n", type);
