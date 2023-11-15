@@ -93,7 +93,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     int height, width, y, x, life;
     getmaxyx(stdscr, height, width);
     y = branch.y;
-    x = branch.y;
+    x = branch.x;
     life = branch.life;
     // type = branch.type;
     struct deltas returnDeltas = {0, 0};
