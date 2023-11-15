@@ -95,60 +95,81 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     y = branch.y;
     x = branch.x;
     life = branch.life;
-    // type = branch.type;
+
     struct deltas returnDeltas = {0, 0};
     int xroll, yroll;
     xroll = rollDie(1, 15);
     yroll = rollDie(1, 10);
+
+    // flags to prevent deltas from leaving the screen
+    int top, bottom, left, right = FALSE;
+    if (y >= height - 1)
+    {
+        bottom = TRUE;
+    }
+    else if (y <= 1)
+    {
+        top = TRUE;
+    }
+
+    if (x >= width - 1)
+    {
+        right = TRUE;
+    }
+    else if (x <= 1)
+    {
+        left = TRUE;
+    }
+
     if (life == young)
     {
         // modify dx
-        if (xroll <= 5)
+        if (xroll <= 5 && !right)
         {
             returnDeltas.dx++;
         }
-        else if (xroll <= 10)
+        else if (xroll <= 10 && !left)
         {
             returnDeltas.dx--;
         }
         // modify dy
-        if (yroll <= 3)
+        if (yroll <= 3 && !top)
         {
-            returnDeltas.dy++;
+            returnDeltas.dy--;
         }
     }
     else if (life == middle)
     {
         // modify dx
-        if (xroll <= 5)
+        if (xroll <= 5 && !right)
         {
             returnDeltas.dx++;
         }
-        else if (xroll <= 10)
+        else if (xroll <= 10 && !left)
         {
             returnDeltas.dx--;
         }
         // modify dy
-        if (yroll <= 7)
+        if (yroll <= 7 && !top)
         {
-            returnDeltas.dy++;
+            returnDeltas.dy--;
         }
     }
     else if (life == old)
     {
         // modify dx
-        if (xroll <= 5)
+        if (xroll <= 5 && !right)
         {
             returnDeltas.dx++;
         }
-        else if (xroll <= 10)
+        else if (xroll <= 10 && !left)
         {
             returnDeltas.dx--;
         }
         // modify dy
         if (yroll <= 1)
         {
-            returnDeltas.dy++;
+            returnDeltas.dy--;
         }
     }
 
@@ -166,24 +187,6 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         int pickRoll = rollDie(0, freeSize - 1);
         returnDeltas.dy = freeNeighbors[pickRoll].dy;
         returnDeltas.dx = freeNeighbors[pickRoll].dx;
-    }
-
-    // rule out deltas that would bring the next branch off screen TODO
-    if (x <= 1 && returnDeltas.dx == -1)
-    {
-        returnDeltas.dx = 0;
-    }
-    else if (y <= 1 && returnDeltas.dy == -1)
-    {
-        returnDeltas.dy = 0;
-    }
-    else if (x >= width - 1 && returnDeltas.dx == 1)
-    {
-        returnDeltas.dx = 0;
-    }
-    else if (y >= height - 1 && returnDeltas.dy == 1)
-    {
-        returnDeltas.dy = 0;
     }
 
     return returnDeltas;

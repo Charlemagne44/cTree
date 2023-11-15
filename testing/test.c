@@ -92,6 +92,37 @@ int testGetFreeNeighbors()
     return TRUE;
 }
 
+int testGetDelta()
+{
+    // run 100 iterations of getting the delta for the starting trunks
+    for (int i = 0; i < 100; i++)
+    {
+        initscr();
+        int height, width;
+        getmaxyx(stdscr, height, width);
+        struct branch branch = {
+            trunk,
+            young,
+            width / 2,
+            height - 1,
+            "~",
+        };
+        struct deltas deltas = getDelta(stdscr, branch);
+        // check to make sure delta does not go under the screen
+        if (deltas.dy > 0)
+        {
+            endwin();
+            printf("bad delta (dy, dx): (%d, %d) on iteration: %d\n", deltas.dy, deltas.dx, i);
+            return FALSE;
+        }
+
+        endwin();
+        printf("returned deltas (dy, dx): (%d, %d)\n", deltas.dy, deltas.dx);
+    }
+
+    return TRUE;
+}
+
 /* Run all the tests without assertions that reqiure looking at the output */
 void runManualTests()
 {
@@ -107,7 +138,11 @@ int main()
     if (!testGetNeighbors())
         printf("testGetNeighbors failed\n");
 
+    if (!testGetDelta())
+        printf("testGetDelta failed\n");
+
     // comment out too avoid manual tests
-    runManualTests();
+    // runManualTests();
+
     return 0;
 }
