@@ -5,6 +5,9 @@
 #include <time.h>
 
 #define STARTING_TRUNKS 1
+#define SLEEP_MILLISECONDS 200
+#define SLEEP_BETWEEN_RENDER 1
+#define KEY_BETWEEN_RENDER 0
 
 enum life
 {

@@ -301,11 +301,15 @@ struct branch *createNewBranch(int life, int type, struct deltas deltas, struct 
 
 void grow(WINDOW *win, struct branch *branch)
 {
+    if (KEY_BETWEEN_RENDER)
+        getch();
+    if (SLEEP_BETWEEN_RENDER)
+    {
+        napms(SLEEP_MILLISECONDS);
+    }
     // render current branch;
     mvwprintw(win, branch->y, branch->x, branch->character);
     wrefresh(win);
-    getch();
-
     // if dead, run leaf probability and then return
     if (branch->life == dead)
     {
@@ -334,19 +338,23 @@ void grow(WINDOW *win, struct branch *branch)
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
+        break;
     case middle:
         if (branchRoll <= 6) // 6/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
+        break;
     case old:
         if (branchRoll <= 3) // 3/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
+        break;
     case dead:
+        break;
     }
 
     // increment age and decrement life
