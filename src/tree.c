@@ -303,7 +303,7 @@ void grow(WINDOW *win, struct branch *branch)
 {
     if (KEY_BETWEEN_RENDER)
         getch();
-    if (SLEEP_BETWEEN_RENDER)
+    else if (SLEEP_BETWEEN_RENDER)
     {
         napms(SLEEP_MILLISECONDS);
     }
