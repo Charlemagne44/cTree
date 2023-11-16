@@ -11,7 +11,6 @@ void init(struct ncursesObjects *objects)
     int height, width;
     getmaxyx(stdscr, height, width);
     objects->treewin = newwin(height, width, 0, 0);
-    // basewin TODO
 }
 
 void cleanup(struct ncursesObjects *objects)
@@ -270,7 +269,6 @@ int checkCollision(WINDOW *win, int y, int x)
 {
     chtype ch = mvwinch(win, y, x);
     char character = (char)(ch & A_CHARTEXT);
-    // wprintw(win, "Character grabbed: %c from coords: %d %d\n", character, y, x);
     if (character == '&')
         return FALSE;
     else if (character != ' ')
@@ -300,7 +298,6 @@ struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n)
                     endwin();
                     exit(EXIT_FAILURE);
                 }
-                // struct deltas newDelta = {i, j};
                 collisions[*n - 1].dy = i;
                 collisions[*n - 1].dx = j;
             }
@@ -354,6 +351,7 @@ void bud(WINDOW *win, int y, int x)
 
 void grow(WINDOW *win, struct branch *branch)
 {
+    // either wait for input or sleep depending on config
     if (KEY_BETWEEN_RENDER)
         getch();
     else if (SLEEP_BETWEEN_RENDER)
@@ -372,12 +370,11 @@ void grow(WINDOW *win, struct branch *branch)
         branch->life = dead; // boxed in
     }
 
-    // if dead, run leaf probability and then return
+    // if dead, run leaf budding and then return
     if (branch->life == dead)
     {
         if (branch->type != trunk)
         {
-            // TODO - leaf logic
             branch->character = "&";
             bud(win, branch->y, branch->x);
             mvwprintw(win, branch->y, branch->x, branch->character);
@@ -388,7 +385,6 @@ void grow(WINDOW *win, struct branch *branch)
 
     int newType = getNewType(deltas, branch->type);
 
-    // grow the branches based upon age TODO - OTHER AGES
     int branchRoll = rollDie(1, 10);
     switch (branch->life)
     {
@@ -405,14 +401,14 @@ void grow(WINDOW *win, struct branch *branch)
         }
         break;
     case middle:
-        if (branchRoll <= 6) // 6/10 chance to grow a young branch
+        if (branchRoll <= 6) // 6/10 chance to grow a middle aged branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
         break;
     case old:
-        if (branchRoll <= 3) // 3/10 chance to grow a young branch
+        if (branchRoll <= 3) // 3/10 chance to grow an old branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
