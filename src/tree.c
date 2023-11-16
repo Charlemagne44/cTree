@@ -86,13 +86,36 @@ struct deltas *getFreeNeighbors(struct deltas *neighborDelta, int n)
     return FreeDeltas;
 }
 
+void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int rightFlag, int leftFlag, int rightCap, int leftCap, int upCap)
+{
+    // modify dx
+    if (xroll <= rightCap && !rightFlag)
+    {
+        deltas->dx++;
+    }
+    else if (xroll <= leftCap && !leftFlag)
+    {
+        deltas->dx--;
+    }
+    // modify dy - > Highly encourage young branches up
+    if (yroll <= upCap && !topFlag)
+    {
+        deltas->dy--;
+    }
+}
+
 struct deltas getDelta(WINDOW *win, struct branch branch)
 {
-    int height, width, y, x, life;
+    int height, width, y, x, life, type;
     getmaxyx(stdscr, height, width);
     y = branch.y;
     x = branch.x;
     life = branch.life;
+    type = branch.type;
+
+    // int n = 0;
+    // struct deltas *neighborDeltas = getNeighbors(win, y, x, &n);
+    // struct deltas *freeDeltas = getFreeNeighbors(neighborDeltas, n);
 
     struct deltas returnDeltas = {0, 0};
     int xroll, yroll;
@@ -100,78 +123,72 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     yroll = rollDie(1, 10);
 
     // flags to prevent deltas from leaving the screen
-    int top = FALSE;
-    int bottom = FALSE;
-    int left = FALSE;
-    int right = FALSE;
+    int topFlag = FALSE;
+    int bottomFlag = FALSE;
+    int leftFlag = FALSE;
+    int rightFlag = FALSE;
     if (y >= height - 1)
     {
-        bottom = TRUE; // TODO, PREVENT BOTTOMING OUT
+        bottomFlag = TRUE; // TODO, PREVENT BOTTOMING OUT
     }
     else if (y <= 1)
     {
-        top = TRUE;
+        topFlag = TRUE;
     }
 
     if (x >= width - 1)
     {
-        right = TRUE;
+        rightFlag = TRUE;
     }
     else if (x <= 1)
     {
-        left = TRUE;
+        leftFlag = TRUE;
     }
 
     // TODO - Encourage growth based upon branch type
     if (life == young)
     {
-        // modify dx
-        if (xroll <= 5 && !right)
+        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
         {
-            returnDeltas.dx++;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 8); // vertical patterns
         }
-        else if (xroll <= 10 && !left)
+        else if (type == up || type == down)
         {
-            returnDeltas.dx--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 7, 14, 3); // lateral patterns
         }
-        // modify dy - > Highly encourage young branches up
-        if (yroll <= 8 && !top)
+        else
         {
-            returnDeltas.dy--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 5); // balanced patterns
         }
     }
     else if (life == middle)
     {
-        // modify dx
-        if (xroll <= 7 && !right)
+        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
         {
-            returnDeltas.dx++;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 4, 8, 7); // vertical patterns
         }
-        else if (xroll <= 15 && !left)
+        else if (type == up || type == down)
         {
-            returnDeltas.dx--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 3); // lateral patterns
         }
-        // modify dy
-        if (yroll <= 7 && !top) // middle aged branches likely to go up
+        else
         {
-            returnDeltas.dy--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 5); // balanced patterns
         }
     }
     else if (life == old) //
     {
-        // modify dx
-        if (xroll <= 5 && !right)
+        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
         {
-            returnDeltas.dx++;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 4, 8, 6); // vertical patterns
         }
-        else if (xroll <= 10 && !left)
+        else if (type == up || type == down)
         {
-            returnDeltas.dx--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 1); // lateral patterns
         }
-        // modify dy
-        if (yroll <= 3 && !top)
+        else
         {
-            returnDeltas.dy--;
+            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 5); // lateral patterns
         }
     }
 

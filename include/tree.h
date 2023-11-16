@@ -61,6 +61,7 @@ void start(struct ncursesObjects *objects);
 char getCharacter(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
+void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int rightFlag, int leftFlag, int rightCap, int leftCap, int upCap);
 int getNewType(struct deltas deltas, enum branchType parentType);
 int checkCollision(WINDOW *win, int y, int x);
 struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
