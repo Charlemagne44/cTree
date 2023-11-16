@@ -8,7 +8,7 @@
 #define TREE_H
 
 #define STARTING_TRUNKS 1
-#define SLEEP_MILLISECONDS 200
+#define SLEEP_MILLISECONDS 50
 #define SLEEP_BETWEEN_RENDER 1
 #define KEY_BETWEEN_RENDER 0
 
@@ -66,6 +66,7 @@ int checkCollision(WINDOW *win, int y, int x);
 struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
 struct deltas *getFreeNeighbors(struct deltas *neighborDeltas, int n);
 struct branch *createNewBranch(int life, int type, struct deltas deltas, struct branch *branch);
+void bud(WINDOW *win, int y, int x);
 void grow(WINDOW *win, struct branch *branch);
 
 // debug functions

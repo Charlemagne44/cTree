@@ -271,7 +271,9 @@ int checkCollision(WINDOW *win, int y, int x)
     chtype ch = mvwinch(win, y, x);
     char character = (char)(ch & A_CHARTEXT);
     // wprintw(win, "Character grabbed: %c from coords: %d %d\n", character, y, x);
-    if (character != ' ')
+    if (character == '&')
+        return FALSE;
+    else if (character != ' ')
     {
         return TRUE;
     }
@@ -323,6 +325,33 @@ struct branch *createNewBranch(int life, int type, struct deltas deltas, struct 
     return newBranch;
 }
 
+/* Bud leaves on eligible surrounding tiles after a branch has died within the grow function */
+void bud(WINDOW *win, int y, int x)
+{
+    // character at given y x should already be a leaf, not it is our time to randomly select a set
+    // of coordinates out of the surrounding 8 possible deltas to turn into a leaf
+    for (int i = -1; i <= 1; i++) // y
+    {
+        for (int j = -1; j <= 1; j++) // x
+        {
+            if (i == 0 && j == 0)
+                continue;
+            // roll to decide if we will leaf at this coordinate
+            if (rollDie(1, 10) <= 3)
+            {
+                int newy;
+                int newx;
+                newy = y + i;
+                newx = x + j;
+                mvwprintw(win, newy, newx, "&");
+                wrefresh(win);
+                if (SLEEP_BETWEEN_RENDER)
+                    napms(SLEEP_MILLISECONDS);
+            }
+        }
+    }
+}
+
 void grow(WINDOW *win, struct branch *branch)
 {
     if (KEY_BETWEEN_RENDER)
@@ -350,6 +379,7 @@ void grow(WINDOW *win, struct branch *branch)
         {
             // TODO - leaf logic
             branch->character = "&";
+            bud(win, branch->y, branch->x);
             mvwprintw(win, branch->y, branch->x, branch->character);
             wrefresh(win);
         }
