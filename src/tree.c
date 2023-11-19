@@ -387,9 +387,30 @@ void grow(WINDOW *win, struct branch *branch)
         branch->life = dead; // boxed in
     }
 
+    int newType = getNewType(deltas, branch->type);
+
     // if dead, run leaf budding and then return
     if (branch->life == dead)
     {
+        // don't let a path end on a downward trend
+        if (branch->type == down || branch->type == downLeft || branch->type == downRight)
+        {
+            // random chance to either bud or a last chance branch
+            // all paths within must return
+            if (rollDie(1, 10) <= 5)
+            {
+                struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
+                grow(win, newBranch);
+                return;
+            }
+            else
+            {
+                branch->character = "&";
+                mvwprintw(win, branch->y, branch->x, branch->character);
+                wrefresh(win);
+                return;
+            }
+        }
         int height = getmaxy(win);
         float heightPercentage = 1.0 - ((float)branch->y / (float)height);
         if (branch->type != trunk && heightPercentage > LEAF_HEIGHT_PERCENTAGE_MIN)
@@ -401,8 +422,6 @@ void grow(WINDOW *win, struct branch *branch)
         }
         return;
     }
-
-    int newType = getNewType(deltas, branch->type);
 
     int branchRoll = rollDie(1, 10);
     switch (branch->life)
