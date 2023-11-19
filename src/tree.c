@@ -390,7 +390,9 @@ void grow(WINDOW *win, struct branch *branch)
     // if dead, run leaf budding and then return
     if (branch->life == dead)
     {
-        if (branch->type != trunk)
+        int height = getmaxy(win);
+        float heightPercentage = 1.0 - ((float)branch->y / (float)height);
+        if (branch->type != trunk && heightPercentage > LEAF_HEIGHT_PERCENTAGE_MIN)
         {
             branch->character = "&";
             bud(win, branch->y, branch->x);
