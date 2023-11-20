@@ -229,7 +229,21 @@ int getNewType(struct deltas deltas, enum branchType parentType)
     {
         if (rollDie(1, 10) <= 3)
         {
-            return trunk;
+            if (deltas.dy < 0)
+            {
+                if (deltas.dx < 0)
+                {
+                    return trunkLeft;
+                }
+                else if (deltas.dx > 0)
+                {
+                    return trunkRight;
+                }
+                else
+                {
+                    return trunk;
+                }
+            }
         }
     }
     if (deltas.dy == 0)
@@ -240,11 +254,23 @@ int getNewType(struct deltas deltas, enum branchType parentType)
         }
         else if (deltas.dx < 0)
         {
-            return left;
+            int leftRoll = rollDie(1, 10);
+            if (leftRoll <= 3)
+                return leftUp;
+            else if (leftRoll <= 4)
+                return leftDown;
+            else
+                return left;
         }
         else
         {
-            return right;
+            int rightRoll = rollDie(1, 10);
+            if (rightRoll <= 3)
+                return rightUp;
+            else if (rightRoll <= 4)
+                return rightDown;
+            else
+                return right;
         }
     }
     else if (deltas.dy < 0)
@@ -372,9 +398,24 @@ void grow(WINDOW *win, struct branch *branch)
         napms(SLEEP_MILLISECONDS);
     }
 
-    // render current branch;
-    mvwprintw(win, branch->y, branch->x, branch->character);
-    wrefresh(win);
+    // render current branch and account for special 2 character branches that need to be printed with a shift
+    // TODO - account for neighbors for special two character branches
+    if (branch->type == trunkLeft || branch->type == leftUp || branch->type == leftDown)
+    {
+        mvwprintw(win, branch->y, branch->x - 1, branch->character);
+        wrefresh(win);
+    }
+    else if (branch->type == trunkRight || branch->type == rightUp || branch->type == rightDown)
+    {
+        mvwprintw(win, branch->y, branch->x, branch->character);
+        branch->x = branch->x + 1;
+        wrefresh(win);
+    }
+    else
+    {
+        mvwprintw(win, branch->y, branch->x, branch->character);
+        wrefresh(win);
+    }
 
     // determine dy, and dx, and type;
     struct deltas deltas = getDelta(win, *branch);
