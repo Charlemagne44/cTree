@@ -8,7 +8,7 @@
 #define TREE_H
 
 #define STARTING_TRUNKS 1
-#define SLEEP_MILLISECONDS 50
+#define SLEEP_MILLISECONDS 25
 #define SLEEP_BETWEEN_RENDER 1
 #define KEY_BETWEEN_RENDER 0
 #define LEAF_HEIGHT_PERCENTAGE_MIN 0.30
@@ -24,8 +24,14 @@ enum life
 enum branchType
 {
     trunk,
+    trunkLeft,
+    trunkRight,
     left,
+    leftUp,
+    leftDown,
     right,
+    rightUp,
+    rightDown,
     up,
     upLeft,
     upRight,
@@ -59,7 +65,7 @@ struct deltas
 void init(struct ncursesObjects *objects);
 void cleanup(struct ncursesObjects *objects);
 void start(struct ncursesObjects *objects);
-char getCharacter(enum branchType type);
+char *getString(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
 void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int bottomFlag, int rightFlag, int leftFlag, int rightCap, int leftCap, int upCap, int downCap);

@@ -211,9 +211,7 @@ int testRollDie()
 int testGetCharacter()
 {
     // up left and down right
-    char str[2];
-    str[0] = getCharacter(upLeft);
-    str[1] = '\0';
+    char *str = getString(upLeft);
 
     if (strcmp(str, "\\") != 0)
     {
@@ -222,8 +220,7 @@ int testGetCharacter()
     }
 
     // up right and down left
-    str[0] = getCharacter(upRight);
-    str[1] = '\0';
+    str = getString(upRight);
 
     if (strcmp(str, "/") != 0)
     {
@@ -232,8 +229,7 @@ int testGetCharacter()
     }
 
     // up and down
-    str[0] = getCharacter(up);
-    str[1] = '\0';
+    str = getString(up);
 
     if (strcmp(str, "|") != 0)
     {
@@ -242,8 +238,7 @@ int testGetCharacter()
     }
 
     // left and rights
-    str[0] = getCharacter(left);
-    str[1] = '\0';
+    str = getString(left);
 
     if (strcmp(str, "-") != 0)
     {

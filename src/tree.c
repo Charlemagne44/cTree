@@ -36,26 +36,36 @@ void printTimeSeed(WINDOW *win, time_t seed)
 }
 
 /* Retrieve the appropriate character from the branch type */
-char getCharacter(enum branchType type)
+char *getString(enum branchType type)
 {
     switch (type)
     {
     case trunk:
-        return '~';
+        return "~";
+    case trunkLeft:
+        return "\\~";
+    case trunkRight:
+        return "~/";
     case left:
     case right:
-        return '-';
+        return "-";
+    case leftUp:
+    case rightDown:
+        return "\\_";
+    case leftDown:
+    case rightUp:
+        return "_/";
     case up:
     case down:
-        return '|';
+        return "|";
     case upLeft:
     case downRight:
-        return '\\';
+        return "\\";
     case upRight:
     case downLeft:
-        return '/';
+        return "/";
     }
-    return 'd'; // Debug character to show something wrong with the switch
+    return "d"; // Debug character to show something wrong with the switch
 }
 
 /* Basic randomization with a return between upper and lower */
@@ -319,10 +329,7 @@ struct branch *createNewBranch(int life, int type, struct deltas deltas, struct 
     newBranch->x = branch->x + deltas.dx;
     newBranch->y = branch->y + deltas.dy;
     newBranch->parentType = branch->type;
-    char newStr[2];
-    newStr[0] = getCharacter(type);
-    newStr[1] = '\0';
-    newBranch->character = newStr;
+    newBranch->character = getString(type);
 
     return newBranch;
 }
@@ -470,11 +477,7 @@ void start(struct ncursesObjects *objects)
     branch->y = height - 1;
     branch->x = (width / 2);
     branch->parentType = trunk;
-
-    char str[2];
-    str[0] = getCharacter(branch->type);
-    str[1] = '\0';
-    branch->character = str;
+    branch->character = getString(branch->type);
 
     // recursively grow the branch, and re-render the tree each time
     time_t seed = 1700440667; // time(0);
