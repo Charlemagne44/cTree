@@ -48,8 +48,8 @@ int main(int argc, char **argv)
         {
             napms(INFINITE_WAIT_MILLSECONDS_BREAK);
             werase(objects.treewin);
+            wrefresh(objects.treewin);
         }
-        wrefresh(objects.treewin);
         seed = time(0);
         srand(seed);
     } while (infinite);
