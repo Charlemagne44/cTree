@@ -1,5 +1,6 @@
 #include "tree.h"
 
+/* All ncurses related initialization */
 void init(struct ncursesObjects *objects)
 {
     // ncurses initialization
@@ -13,6 +14,7 @@ void init(struct ncursesObjects *objects)
     objects->treewin = newwin(height, width, 0, 0);
 }
 
+/* Ncurses objects cleanup */
 void cleanup(struct ncursesObjects *objects)
 {
     delwin(objects->treewin);
@@ -20,12 +22,14 @@ void cleanup(struct ncursesObjects *objects)
     endwin();
 }
 
+/* Make boxes around the ncurses objects for visualization */
 void makeBoxes(struct ncursesObjects *objects)
 {
     box(objects->treewin, 0, 0);
     wrefresh(objects->treewin);
 }
 
+/* Retrieve the appropriate character from the branch type */
 char getCharacter(enum branchType type)
 {
     switch (type)
@@ -48,6 +52,7 @@ char getCharacter(enum branchType type)
     return 'd'; // Debug character to show something wrong with the switch
 }
 
+/* Basic randomization with a return between upper and lower */
 int rollDie(int lower, int upper)
 {
     return (rand() % (upper - lower + 1)) + lower;
@@ -86,7 +91,8 @@ struct deltas *getFreeNeighbors(struct deltas *neighborDelta, int n)
     return FreeDeltas;
 }
 
-void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int rightFlag, int leftFlag, int rightCap, int leftCap, int upCap)
+/* Modify a deltas struct based upon the bounds and rolls given */
+void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int bottomFlag, int rightFlag, int leftFlag, int rightCap, int leftCap, int upCap, int downCap)
 {
     // modify dx
     if (xroll <= rightCap && !rightFlag)
@@ -97,25 +103,24 @@ void modifyGrowth(struct deltas *deltas, int yroll, int xroll, int topFlag, int 
     {
         deltas->dx--;
     }
-    // modify dy - > Highly encourage young branches up
+    // modify dy
     if (yroll <= upCap && !topFlag)
     {
         deltas->dy--;
     }
+    else if (yroll <= downCap && !bottomFlag)
+    {
+        deltas->dy++;
+    }
 }
 
+/* Get the deltas for the new branch that may be created */
 struct deltas getDelta(WINDOW *win, struct branch branch)
 {
-    int height, width, y, x, life, type;
+    int height, width, y, x;
     getmaxyx(stdscr, height, width);
     y = branch.y;
     x = branch.x;
-    life = branch.life;
-    type = branch.type;
-
-    // int n = 0;
-    // struct deltas *neighborDeltas = getNeighbors(win, y, x, &n);
-    // struct deltas *freeDeltas = getFreeNeighbors(neighborDeltas, n);
 
     struct deltas returnDeltas = {0, 0};
     int xroll, yroll;
@@ -129,7 +134,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     int rightFlag = FALSE;
     if (y >= height - 1)
     {
-        bottomFlag = TRUE; // TODO, PREVENT BOTTOMING OUT
+        bottomFlag = TRUE;
     }
     else if (y <= 1)
     {
@@ -145,51 +150,19 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         leftFlag = TRUE;
     }
 
-    // TODO - Encourage growth based upon branch type
-    if (life == young)
+    // TODO - Encourage growth based upon branch type, height, and age
+    float heightPercentage = 1.0 - ((float)branch.y / (float)height);
+    if (heightPercentage <= 0.33) // encoruage vertical growth
     {
-        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 8); // vertical patterns
-        }
-        else if (type == up || type == down)
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 7, 14, 3); // lateral patterns
-        }
-        else
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 5); // balanced patterns
-        }
+        modifyGrowth(&returnDeltas, yroll, xroll, topFlag, bottomFlag, rightFlag, leftFlag, 4, 8, 9, 9);
     }
-    else if (life == middle)
+    else if (heightPercentage <= 0.66) // encourage balanced vertical / lateral growth
     {
-        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 4, 8, 7); // vertical patterns
-        }
-        else if (type == up || type == down)
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 3); // lateral patterns
-        }
-        else
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 5); // balanced patterns
-        }
+        modifyGrowth(&returnDeltas, yroll, xroll, topFlag, bottomFlag, rightFlag, leftFlag, 6, 12, 6, 7);
     }
-    else if (life == old) //
+    else // encourage lateral growth
     {
-        if (type == left || type == right || type == trunk) // moving laterally -> encoruage vertical
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 4, 8, 6); // vertical patterns
-        }
-        else if (type == up || type == down)
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 5, 10, 1); // lateral patterns
-        }
-        else
-        {
-            modifyGrowth(&returnDeltas, yroll, xroll, topFlag, rightFlag, leftFlag, 6, 12, 5); // lateral patterns
-        }
+        modifyGrowth(&returnDeltas, yroll, xroll, topFlag, bottomFlag, rightFlag, leftFlag, 7, 14, 3, 5);
     }
 
     // check for collisions
@@ -224,6 +197,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     return returnDeltas;
 }
 
+/* Get the type of the new branch with a little randomization included */
 int getNewType(struct deltas deltas, enum branchType parentType)
 {
     // TODO - create a random chance of another trunk occuring, which has unique growth patterns
@@ -366,6 +340,7 @@ void bud(WINDOW *win, int y, int x)
     }
 }
 
+/* Main recursive growth functino kicked off from start */
 void grow(WINDOW *win, struct branch *branch)
 {
     // either wait for input or sleep depending on config
@@ -466,6 +441,7 @@ void grow(WINDOW *win, struct branch *branch)
     }
 }
 
+/* Initiailze necessary parameters to begin growth, and then start the recursion */
 void start(struct ncursesObjects *objects)
 {
     // get screen metrics
