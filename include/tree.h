@@ -1,7 +1,10 @@
 #include <stdio.h>
+#include <ctype.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <ncurses.h>
+#include <panel.h>
 #include <time.h>
 
 #ifndef TREE_H
@@ -53,6 +56,10 @@ struct ncursesObjects
 {
     WINDOW *treewin;
     WINDOW *basewin;
+    WINDOW *helpwin;
+    PANEL *treePanel;
+    PANEL *basePanel;
+    PANEL *helpPanel;
 };
 
 struct deltas
@@ -80,5 +87,6 @@ void grow(WINDOW *win, struct branch *branch);
 // debug functions
 void makeBoxes(struct ncursesObjects *objects);
 void printTimeSeed(WINDOW *win, time_t seed);
+void printHelp(struct ncursesObjects *objects);
 
 #endif

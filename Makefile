@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-LIBS = -lncurses
+LIBS = -lncurses -lpanel
 INCLUDE = -I./include
 
 SRC_DIR = src

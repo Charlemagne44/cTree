@@ -11,7 +11,16 @@ void init(struct ncursesObjects *objects)
     // window initialization
     int height, width;
     getmaxyx(stdscr, height, width);
+    objects->helpwin = newwin(8, width / 2, 0, 0);
     objects->treewin = newwin(height, width, 0, 0);
+
+    objects->helpPanel = new_panel(objects->helpwin);
+    objects->treePanel = new_panel(objects->treewin);
+
+    set_panel_userptr(objects->treePanel, objects->helpPanel);
+    set_panel_userptr(objects->helpPanel, objects->treePanel);
+
+    update_panels();
 }
 
 /* Ncurses objects cleanup */
@@ -19,6 +28,7 @@ void cleanup(struct ncursesObjects *objects)
 {
     delwin(objects->treewin);
     delwin(objects->basewin);
+    delwin(objects->helpwin);
     endwin();
 }
 
@@ -27,12 +37,41 @@ void makeBoxes(struct ncursesObjects *objects)
 {
     box(objects->treewin, 0, 0);
     wrefresh(objects->treewin);
+    doupdate();
 }
 
 /* Print the time seed to assist in debugging from time based randomization */
 void printTimeSeed(WINDOW *win, time_t seed)
 {
     mvwprintw(win, 0, 0, "Time seed: %ld\n", seed);
+}
+
+void printHelp(struct ncursesObjects *objects)
+{
+    int width = getmaxx(objects->helpwin);
+    char *title = "C TREE GENERATOR";
+    int titleLen = strlen(title);
+
+    box(objects->helpwin, 0, 0);
+    wmove(objects->helpwin, 1, width / 2 - (titleLen / 2));
+    wattron(objects->helpwin, A_BOLD);
+    wprintw(objects->helpwin, title);
+    wattroff(objects->helpwin, A_BOLD);
+    mvwprintw(objects->helpwin, 2, 1, "-h: Show help menu");
+    mvwprintw(objects->helpwin, 3, 1, "-d: Show seed debug information");
+    mvwprintw(objects->helpwin, 4, 1, "-s: Supply a seed to the randomizer");
+    mvwprintw(objects->helpwin, 5, 1, "-l: Watch the growth live");
+    mvwprintw(objects->helpwin, 6, 1, "-i: Infinitely generate trees");
+
+    wrefresh(objects->treewin);
+    top_panel(objects->helpPanel);
+    update_panels();
+    doupdate();
+
+    getch();
+    top_panel(objects->treePanel);
+    update_panels();
+    doupdate();
 }
 
 /* Retrieve the appropriate character from the branch type */
@@ -380,6 +419,7 @@ void bud(WINDOW *win, int y, int x)
                 newx = x + j;
                 mvwprintw(win, newy, newx, "&");
                 wrefresh(win);
+                doupdate();
                 if (SLEEP_BETWEEN_RENDER)
                     napms(SLEEP_MILLISECONDS);
             }
@@ -404,17 +444,20 @@ void grow(WINDOW *win, struct branch *branch)
     {
         mvwprintw(win, branch->y, branch->x - 1, branch->character);
         wrefresh(win);
+        doupdate();
     }
     else if (branch->type == trunkRight || branch->type == rightUp || branch->type == rightDown)
     {
         mvwprintw(win, branch->y, branch->x, branch->character);
         branch->x = branch->x + 1;
         wrefresh(win);
+        doupdate();
     }
     else
     {
         mvwprintw(win, branch->y, branch->x, branch->character);
         wrefresh(win);
+        doupdate();
     }
 
     // determine dy, and dx, and type;
@@ -450,6 +493,7 @@ void grow(WINDOW *win, struct branch *branch)
                 bud(win, branch->y, branch->x);
                 mvwprintw(win, branch->y, branch->x, branch->character);
                 wrefresh(win);
+                doupdate();
                 return;
             }
         }
@@ -460,6 +504,7 @@ void grow(WINDOW *win, struct branch *branch)
             bud(win, branch->y, branch->x);
             mvwprintw(win, branch->y, branch->x, branch->character);
             wrefresh(win);
+            doupdate();
         }
         return;
     }
