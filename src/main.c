@@ -8,7 +8,9 @@ int main(int argc, char **argv)
     __u_long seed = time(0);
 
     int c;
-    while ((c = getopt(argc, argv, "hds:")) != -1)
+    int live = FALSE;
+    long sleepMilliseconds = 0;
+    while ((c = getopt(argc, argv, "hds:l:")) != -1)
     {
         switch (c)
         {
@@ -19,12 +21,18 @@ int main(int argc, char **argv)
         case 's':
             char *endptr;
             seed = strtoul(optarg, &endptr, 10);
+            break;
         case 'd':
             printTimeSeed(&objects, seed);
+            break;
+        case 'l':
+            live = TRUE;
+            sleepMilliseconds = strtol(optarg, &endptr, 10);
+            break;
         }
     }
 
-    start(&objects, seed);
+    start(&objects, seed, live, sleepMilliseconds);
 
     move(0, 0);
     getch();

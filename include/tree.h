@@ -11,8 +11,6 @@
 #define TREE_H
 
 #define STARTING_TRUNKS 1
-#define SLEEP_MILLISECONDS 25
-#define SLEEP_BETWEEN_RENDER 1
 #define KEY_BETWEEN_RENDER 0
 #define LEAF_HEIGHT_PERCENTAGE_MIN 0.30
 
@@ -71,7 +69,7 @@ struct deltas
 // necessary functions
 void init(struct ncursesObjects *objects);
 void cleanup(struct ncursesObjects *objects);
-void start(struct ncursesObjects *objects, __u_long seed);
+void start(struct ncursesObjects *objects, __u_long seed, int live, long sleep);
 char *getString(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
@@ -81,8 +79,8 @@ int checkCollision(WINDOW *win, int y, int x);
 struct deltas *getNeighbors(WINDOW *win, int y, int x, int *n);
 struct deltas *getFreeNeighbors(struct deltas *neighborDeltas, int n);
 struct branch *createNewBranch(int life, int type, struct deltas deltas, struct branch *branch);
-void bud(WINDOW *win, int y, int x);
-void grow(WINDOW *win, struct branch *branch);
+void bud(WINDOW *win, int y, int x, int live, long sleep);
+void grow(WINDOW *win, struct branch *branch, int live, long sleep);
 
 // debug functions
 void makeBoxes(struct ncursesObjects *objects);
