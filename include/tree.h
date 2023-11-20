@@ -71,7 +71,7 @@ struct deltas
 // necessary functions
 void init(struct ncursesObjects *objects);
 void cleanup(struct ncursesObjects *objects);
-void start(struct ncursesObjects *objects);
+void start(struct ncursesObjects *objects, __u_long seed);
 char *getString(enum branchType type);
 int rollDie(int lower, int upper);
 struct deltas getDelta(WINDOW *win, struct branch branch);
@@ -86,7 +86,7 @@ void grow(WINDOW *win, struct branch *branch);
 
 // debug functions
 void makeBoxes(struct ncursesObjects *objects);
-void printTimeSeed(WINDOW *win, time_t seed);
+void printTimeSeed(struct ncursesObjects *objects, time_t seed);
 void printHelp(struct ncursesObjects *objects);
 
 #endif

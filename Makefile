@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-LIBS = -lncurses -lpanel
+LIBS = -lncurses -lpanel -std=gnu11
 INCLUDE = -I./include
 
 SRC_DIR = src

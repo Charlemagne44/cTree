@@ -41,9 +41,9 @@ void makeBoxes(struct ncursesObjects *objects)
 }
 
 /* Print the time seed to assist in debugging from time based randomization */
-void printTimeSeed(WINDOW *win, time_t seed)
+void printTimeSeed(struct ncursesObjects *objects, time_t seed)
 {
-    mvwprintw(win, 0, 0, "Time seed: %ld\n", seed);
+    mvwprintw(objects->treewin, 0, 0, "Time seed: %ld\n", seed);
 }
 
 void printHelp(struct ncursesObjects *objects)
@@ -553,7 +553,7 @@ void grow(WINDOW *win, struct branch *branch)
 }
 
 /* Initiailze necessary parameters to begin growth, and then start the recursion */
-void start(struct ncursesObjects *objects)
+void start(struct ncursesObjects *objects, __u_long seed)
 {
     // get screen metrics
     int height, width;
@@ -570,8 +570,6 @@ void start(struct ncursesObjects *objects)
     branch->character = getString(branch->type);
 
     // recursively grow the branch, and re-render the tree each time
-    time_t seed = time(0);
-    srand(seed);
-    printTimeSeed(objects->treewin, seed);
+    srand((int)seed);
     grow(objects->treewin, branch);
 }
