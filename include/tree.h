@@ -13,6 +13,7 @@
 #define STARTING_TRUNKS 1
 #define KEY_BETWEEN_RENDER 0
 #define LEAF_HEIGHT_PERCENTAGE_MIN 0.30
+#define INFINITE_WAIT_MILLSECONDS_BREAK 3000
 
 enum life
 {
@@ -55,9 +56,11 @@ struct ncursesObjects
     WINDOW *treewin;
     WINDOW *basewin;
     WINDOW *helpwin;
+    WINDOW *debugwin;
     PANEL *treePanel;
     PANEL *basePanel;
     PANEL *helpPanel;
+    PANEL *debugPanel;
 };
 
 struct deltas

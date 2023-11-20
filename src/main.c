@@ -9,8 +9,10 @@ int main(int argc, char **argv)
 
     int c;
     int live = FALSE;
+    int infinite = FALSE;
+    int debug = FALSE;
     long sleepMilliseconds = 0;
-    while ((c = getopt(argc, argv, "hds:l:")) != -1)
+    while ((c = getopt(argc, argv, "hds:l:i")) != -1)
     {
         switch (c)
         {
@@ -23,16 +25,34 @@ int main(int argc, char **argv)
             seed = strtoul(optarg, &endptr, 10);
             break;
         case 'd':
-            printTimeSeed(&objects, seed);
+            debug = TRUE;
             break;
         case 'l':
             live = TRUE;
             sleepMilliseconds = strtol(optarg, &endptr, 10);
             break;
+        case 'i':
+            infinite = TRUE;
+            break;
         }
     }
 
-    start(&objects, seed, live, sleepMilliseconds);
+    do
+    {
+        if (debug)
+        {
+            printTimeSeed(&objects, seed);
+        }
+        start(&objects, seed, live, sleepMilliseconds);
+        if (infinite)
+        {
+            napms(INFINITE_WAIT_MILLSECONDS_BREAK);
+            werase(objects.treewin);
+        }
+        wrefresh(objects.treewin);
+        seed = time(0);
+        srand(seed);
+    } while (infinite);
 
     move(0, 0);
     getch();

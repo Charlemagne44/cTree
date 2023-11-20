@@ -13,12 +13,16 @@ void init(struct ncursesObjects *objects)
     getmaxyx(stdscr, height, width);
     objects->helpwin = newwin(8, width / 2, 0, 0);
     objects->treewin = newwin(height, width, 0, 0);
+    objects->debugwin = newwin(8, width / 3, 0, 0);
 
     objects->helpPanel = new_panel(objects->helpwin);
     objects->treePanel = new_panel(objects->treewin);
+    objects->debugPanel = new_panel(objects->debugwin);
 
     set_panel_userptr(objects->treePanel, objects->helpPanel);
     set_panel_userptr(objects->helpPanel, objects->treePanel);
+    set_panel_userptr(objects->treePanel, objects->debugPanel);
+    set_panel_userptr(objects->debugPanel, objects->treePanel);
 
     update_panels();
 }
@@ -43,7 +47,12 @@ void makeBoxes(struct ncursesObjects *objects)
 /* Print the time seed to assist in debugging from time based randomization */
 void printTimeSeed(struct ncursesObjects *objects, time_t seed)
 {
-    mvwprintw(objects->treewin, 0, 0, "Time seed: %ld\n", seed);
+    mvwprintw(objects->debugwin, 1, 1, "Time seed: %ld\n", seed);
+    box(objects->debugwin, 0, 0);
+    wrefresh(objects->debugwin);
+    top_panel(objects->debugPanel);
+    update_panels();
+    doupdate();
 }
 
 void printHelp(struct ncursesObjects *objects)
