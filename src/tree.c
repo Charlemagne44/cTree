@@ -29,6 +29,12 @@ void makeBoxes(struct ncursesObjects *objects)
     wrefresh(objects->treewin);
 }
 
+/* Print the time seed to assist in debugging from time based randomization */
+void printTimeSeed(WINDOW *win, time_t seed)
+{
+    mvwprintw(win, 0, 0, "Time seed: %ld\n", seed);
+}
+
 /* Retrieve the appropriate character from the branch type */
 char getCharacter(enum branchType type)
 {
@@ -463,6 +469,8 @@ void start(struct ncursesObjects *objects)
     branch->character = str;
 
     // recursively grow the branch, and re-render the tree each time
-    srand(time(0));
+    time_t seed = time(0);
+    srand(seed);
+    printTimeSeed(objects->treewin, seed);
     grow(objects->treewin, branch);
 }
