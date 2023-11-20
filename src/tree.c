@@ -443,6 +443,7 @@ void grow(WINDOW *win, struct branch *branch)
             else
             {
                 branch->character = "&";
+                bud(win, branch->y, branch->x);
                 mvwprintw(win, branch->y, branch->x, branch->character);
                 wrefresh(win);
                 return;
