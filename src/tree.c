@@ -170,7 +170,7 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
     float heightPercentage = 1.0 - ((float)branch.y / (float)height);
     if (heightPercentage <= 0.33) // encoruage vertical growth
     {
-        modifyGrowth(&returnDeltas, yroll, xroll, topFlag, bottomFlag, rightFlag, leftFlag, 4, 8, 9, 9);
+        modifyGrowth(&returnDeltas, yroll, xroll, topFlag, bottomFlag, rightFlag, leftFlag, 4, 8, 10, 10);
     }
     else if (heightPercentage <= 0.66) // encourage balanced vertical / lateral growth
     {
@@ -426,6 +426,10 @@ void grow(WINDOW *win, struct branch *branch)
 
     int newType = getNewType(deltas, branch->type);
 
+    // set height related growth parameters before budding and growing
+    int height = getmaxy(win);
+    float heightPercentage = 1.0 - ((float)branch->y / (float)height);
+
     // if dead, run leaf budding and then return
     if (branch->life == dead)
     {
@@ -449,8 +453,7 @@ void grow(WINDOW *win, struct branch *branch)
                 return;
             }
         }
-        int height = getmaxy(win);
-        float heightPercentage = 1.0 - ((float)branch->y / (float)height);
+
         if (branch->type != trunk && heightPercentage > LEAF_HEIGHT_PERCENTAGE_MIN)
         {
             branch->character = "&";
@@ -470,7 +473,7 @@ void grow(WINDOW *win, struct branch *branch)
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
         }
-        else if (branchRoll <= 9) // 9/10 chance to grow a young branch
+        else if (branchRoll <= 9 || heightPercentage <= LEAF_HEIGHT_PERCENTAGE_MIN) // 9/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch);
@@ -522,7 +525,7 @@ void start(struct ncursesObjects *objects)
     branch->character = getString(branch->type);
 
     // recursively grow the branch, and re-render the tree each time
-    time_t seed = 1700440667; // time(0);
+    time_t seed = time(0);
     srand(seed);
     printTimeSeed(objects->treewin, seed);
     grow(objects->treewin, branch);
