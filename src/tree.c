@@ -214,7 +214,6 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         leftFlag = TRUE;
     }
 
-    // TODO - Encourage growth based upon branch type, height, and age
     float heightPercentage = 1.0 - ((float)branch.y / (float)height);
     if (heightPercentage <= 0.33) // encoruage vertical growth
     {
@@ -237,8 +236,6 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         // if the new spot will have a collision, have a chance to choose a random spot of free neighbors
         // else -> return 0, 0 to discourage more branching
         // older branches higher off the ground should have a higher probability of searching for free neighbors
-        // TODO - ENCOURAGE CURRENT TREND OF GROWTH
-        // TODO - PREVENT BOTTOMING OUT
         float heightMultiplier = 1.0 + (1.0 - ((float)branch.y / (float)height));
         float ageMultipier = 1.0 + (1.0 / (1 + branch.life));
         if ((float)rollDie(1, 10) * ageMultipier * heightMultiplier <= 5.0)
@@ -272,7 +269,6 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
 /* Get the type of the new branch with a little randomization included */
 int getNewType(struct deltas deltas, enum branchType parentType)
 {
-    // TODO - create a random chance of another trunk occuring, which has unique growth patterns
     if (parentType == trunk || parentType == left || parentType == right)
     {
         if (rollDie(1, 10) <= 3)
@@ -298,7 +294,7 @@ int getNewType(struct deltas deltas, enum branchType parentType)
     {
         if (deltas.dx == 0)
         {
-            return trunk; // TODO - impossible , will not happen
+            return trunk;
         }
         else if (deltas.dx < 0)
         {
@@ -448,7 +444,6 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep)
     }
 
     // render current branch and account for special 2 character branches that need to be printed with a shift
-    // TODO - account for neighbors for special two character branches
     if (branch->type == trunkLeft || branch->type == leftUp || branch->type == leftDown)
     {
         mvwprintw(win, branch->y, branch->x - 1, branch->character);
