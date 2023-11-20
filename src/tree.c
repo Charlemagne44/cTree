@@ -181,17 +181,25 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
         // older branches higher off the ground should have a higher probability of searching for free neighbors
         // TODO - ENCOURAGE CURRENT TREND OF GROWTH
         // TODO - PREVENT BOTTOMING OUT
-        int heightMultiplier = 1.0 + (1.0 - ((float)branch.y / (float)height));
-        int ageMultipier = 1.0 + (1.0 / (1 + branch.life));
-        if (rollDie(1, 10) * ageMultipier * heightMultiplier <= 5.0)
+        float heightMultiplier = 1.0 + (1.0 - ((float)branch.y / (float)height));
+        float ageMultipier = 1.0 + (1.0 / (1 + branch.life));
+        if ((float)rollDie(1, 10) * ageMultipier * heightMultiplier <= 5.0)
         {
             int n = 0;
             struct deltas *neighborDelta = getNeighbors(win, branch.y, branch.x, &n);
             struct deltas *freeNeighbors = getFreeNeighbors(neighborDelta, n);
             int freeSize = 8 - n;
-            int pickRoll = rollDie(0, freeSize - 1);
-            returnDeltas.dy = freeNeighbors[pickRoll].dy;
-            returnDeltas.dx = freeNeighbors[pickRoll].dx;
+            if (freeSize)
+            {
+                int pickRoll = rollDie(0, freeSize - 1);
+                returnDeltas.dy = freeNeighbors[pickRoll].dy;
+                returnDeltas.dx = freeNeighbors[pickRoll].dx;
+            }
+            else
+            {
+                returnDeltas.dy = 0;
+                returnDeltas.dx = 0;
+            }
         }
         else
         {
@@ -469,7 +477,7 @@ void start(struct ncursesObjects *objects)
     branch->character = str;
 
     // recursively grow the branch, and re-render the tree each time
-    time_t seed = time(0);
+    time_t seed = 1700440667; // time(0);
     srand(seed);
     printTimeSeed(objects->treewin, seed);
     grow(objects->treewin, branch);
