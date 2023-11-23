@@ -11,8 +11,9 @@ int main(int argc, char **argv)
     int live = FALSE;
     int infinite = FALSE;
     int debug = FALSE;
-    long sleepMilliseconds = 0;
-    while ((c = getopt(argc, argv, "hds:l:i")) != -1)
+    long sleepMilliseconds = 0; // wait time between writing each character
+    long waitMilliseconds = 0;  // wait time between each tree generated
+    while ((c = getopt(argc, argv, "hds:l:iw:")) != -1)
     {
         switch (c)
         {
@@ -34,6 +35,9 @@ int main(int argc, char **argv)
         case 'i':
             infinite = TRUE;
             break;
+        case 'w':
+            waitMilliseconds = strtol(optarg, &endptr, 10);
+            break;
         }
     }
 
@@ -46,7 +50,10 @@ int main(int argc, char **argv)
         start(&objects, seed, live, sleepMilliseconds);
         if (infinite)
         {
-            napms(INFINITE_WAIT_MILLSECONDS_BREAK);
+            if (waitMilliseconds == 0)
+                napms(INFINITE_WAIT_MILLSECONDS_BREAK);
+            else
+                napms(waitMilliseconds);
             werase(objects.treewin);
             wrefresh(objects.treewin);
         }

@@ -11,18 +11,13 @@ void init(struct ncursesObjects *objects)
     // window initialization
     int height, width;
     getmaxyx(stdscr, height, width);
-    objects->helpwin = newwin(8, width / 2, 0, 0);
+    objects->helpwin = newwin(9, width / 2, 0, 0);
     objects->treewin = newwin(height, width, 0, 0);
-    objects->debugwin = newwin(8, width / 3, 0, 0);
+    objects->debugwin = newwin(9, width / 3, 0, 0);
 
     objects->helpPanel = new_panel(objects->helpwin);
     objects->treePanel = new_panel(objects->treewin);
     objects->debugPanel = new_panel(objects->debugwin);
-
-    set_panel_userptr(objects->treePanel, objects->helpPanel);
-    set_panel_userptr(objects->helpPanel, objects->treePanel);
-    set_panel_userptr(objects->treePanel, objects->debugPanel);
-    set_panel_userptr(objects->debugPanel, objects->treePanel);
 
     update_panels();
 }
@@ -71,6 +66,7 @@ void printHelp(struct ncursesObjects *objects)
     mvwprintw(objects->helpwin, 4, 1, "-s: Supply a seed to the randomizer");
     mvwprintw(objects->helpwin, 5, 1, "-l: Watch the growth slowed by your milliseconds arg");
     mvwprintw(objects->helpwin, 6, 1, "-i: Infinitely generate trees");
+    mvwprintw(objects->helpwin, 7, 1, "-w: Wait time between trees for infinite arg");
 
     wrefresh(objects->treewin);
     top_panel(objects->helpPanel);
@@ -489,6 +485,7 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep)
             {
                 struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
                 grow(win, newBranch, live, sleep);
+                free(newBranch);
                 return;
             }
             else
@@ -521,11 +518,13 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep)
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch, live, sleep);
+            free(newBranch);
         }
         else if (branchRoll <= 9 || heightPercentage <= LEAF_HEIGHT_PERCENTAGE_MIN) // 9/10 chance to grow a young branch
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch, live, sleep);
+            free(newBranch);
         }
         break;
     case middle:
@@ -533,6 +532,7 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep)
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch, live, sleep);
+            free(newBranch);
         }
         break;
     case old:
@@ -540,6 +540,7 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep)
         {
             struct branch *newBranch = createNewBranch(young, newType, deltas, branch);
             grow(win, newBranch, live, sleep);
+            free(newBranch);
         }
         break;
     case dead:
@@ -576,4 +577,5 @@ void start(struct ncursesObjects *objects, __u_long seed, int live, long sleep)
     // recursively grow the branch, and re-render the tree each time
     srand((int)seed);
     grow(objects->treewin, branch, live, sleep);
+    free(branch);
 }
