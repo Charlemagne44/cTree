@@ -11,7 +11,7 @@ void init(struct ncursesObjects *objects)
     // window initialization
     int height, width;
     getmaxyx(stdscr, height, width);
-    objects->helpwin = newwin(9, width / 2, 0, 0);
+    objects->helpwin = newwin(9, width, 0, 0);
     objects->treewin = newwin(height, width, 0, 0);
     objects->debugwin = newwin(9, width / 3, 0, 0);
 
