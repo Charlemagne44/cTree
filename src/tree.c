@@ -251,6 +251,8 @@ struct deltas getDelta(WINDOW *win, struct branch branch)
                 returnDeltas.dy = 0;
                 returnDeltas.dx = 0;
             }
+            free(neighborDelta);
+            free(freeNeighbors);
         }
         else
         {
