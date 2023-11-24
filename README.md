@@ -53,7 +53,7 @@ Please make sure to update tests as appropriate.
 
 ## Example
 
-![Example](https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNXo3ZDN5Y25mMzhzbTFrY3VwdTh1anVhcGo1NWtnbWgyY21tdmRwbyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/wyBovQxHawRbV2GKJq/giphy.gif)
+[![asciicast](https://asciinema.org/a/NYuJLB1YXlRfNP5FjRL4jghK3.svg)](https://asciinema.org/a/NYuJLB1YXlRfNP5FjRL4jghK3)
 
 ## License
 
