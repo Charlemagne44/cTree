@@ -1,3 +1,5 @@
 .vscode/*
-bin/*
+bin/ctree
+bin/test
+bin/main
 build/*
