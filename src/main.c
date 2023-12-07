@@ -13,6 +13,7 @@ int main(int argc, char **argv)
     int debug = FALSE;
     long sleepMilliseconds = 0; // wait time between writing each character
     long waitMilliseconds = 0;  // wait time between each tree generated
+    char *endptr;
     while ((c = getopt(argc, argv, "hds:l:iw:")) != -1)
     {
         switch (c)
@@ -22,7 +23,6 @@ int main(int argc, char **argv)
             cleanup(&objects);
             return 0;
         case 's':
-            char *endptr;
             seed = strtoul(optarg, &endptr, 10);
             break;
         case 'd':
