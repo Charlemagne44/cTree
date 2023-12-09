@@ -42,7 +42,8 @@ void makeBoxes(struct ncursesObjects *objects)
 /* Print the time seed to assist in debugging from time based randomization */
 void printTimeSeed(struct ncursesObjects *objects, time_t seed)
 {
-    mvwprintw(objects->debugwin, 1, 1, "Time seed: %ld\n", seed);
+    mvwprintw(objects->debugwin, 1, 1, "Time seed:\n");
+    mvwprintw(objects->debugwin, 2, 1, "%ld\n", seed);
     box(objects->debugwin, 0, 0);
     wrefresh(objects->debugwin);
     top_panel(objects->debugPanel);
