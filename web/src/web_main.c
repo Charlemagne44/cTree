@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 
     do
     {
-        start(&tree, seed, live, sleepMilliseconds);
+        start(&tree, seed, live, sleepMilliseconds, height, width);
         if (infinite)
         {
             sleep(INFINITE_WAIT_SECONDS_BREAK);

@@ -15,10 +15,10 @@ PREFIX = /usr/local/bin
 all: main
 
 main: $(SRC_DIR)/web_main.c $(SRC_DIR)/web_tree.c
-	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/ctree $(LIBS) $(INCLUDE)
+	$(CC) $(CFLAGS) $^ -o $(BIN_DIR)/web_ctree $(LIBS) $(INCLUDE)
 
 debug: $(SRC_DIR)/web_main.c $(SRC_DIR)/web_tree.c
-	$(CC) $(CFLAGS) $(DEBUGFLAGS) $^ -o $(BIN_DIR)/$@ $(LIBS) $(INCLUDE)
+	$(CC) $(CFLAGS) $(DEBUGFLAGS) $^ -o $(BIN_DIR)/debug_web_ctree $(LIBS) $(INCLUDE)
 
 clean:
 	rm -f $(BIN_DIR)/* *.o
