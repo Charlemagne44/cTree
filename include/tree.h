@@ -14,6 +14,8 @@
 #define LEAF_HEIGHT_PERCENTAGE_MIN 0.30
 #define INFINITE_WAIT_MILLSECONDS_BREAK 3000
 
+typedef unsigned long __u_long;
+
 enum life
 {
     young,
