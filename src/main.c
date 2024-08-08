@@ -3,9 +3,6 @@
 
 int main(int argc, char **argv)
 {
-    struct ncursesObjects objects;
-    init(&objects);
-    refresh();
     __u_long seed = time(0);
 
     int c;
@@ -20,8 +17,7 @@ int main(int argc, char **argv)
         switch (c)
         {
         case 'h':
-            printHelp(&objects);
-            cleanup(&objects);
+            printHelp();
             return 0;
         case 's':
             seed = strtoul(optarg, &endptr, 10);
@@ -41,6 +37,11 @@ int main(int argc, char **argv)
             break;
         }
     }
+
+    // initialize curses objects after flag parsing
+    struct ncursesObjects objects;
+    init(&objects);
+    refresh();
 
     do
     {

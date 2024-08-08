@@ -51,33 +51,30 @@ void printTimeSeed(struct ncursesObjects *objects, time_t seed)
     doupdate();
 }
 
-void printHelp(struct ncursesObjects *objects)
-{
-    int width = getmaxx(objects->helpwin);
-    char *title = "C TREE GENERATOR";
-    int titleLen = strlen(title);
-
-    box(objects->helpwin, 0, 0);
-    wmove(objects->helpwin, 1, width / 2 - (titleLen / 2));
-    wattron(objects->helpwin, A_BOLD);
-    wprintw(objects->helpwin, title);
-    wattroff(objects->helpwin, A_BOLD);
-    mvwprintw(objects->helpwin, 2, 1, "-h: Show help menu");
-    mvwprintw(objects->helpwin, 3, 1, "-d: Show seed debug information");
-    mvwprintw(objects->helpwin, 4, 1, "-s: Supply a seed to the randomizer");
-    mvwprintw(objects->helpwin, 5, 1, "-l: Watch the growth slowed by your milliseconds arg");
-    mvwprintw(objects->helpwin, 6, 1, "-i: Infinitely generate trees");
-    mvwprintw(objects->helpwin, 7, 1, "-w: Wait time between trees for infinite arg");
-
-    wrefresh(objects->treewin);
-    top_panel(objects->helpPanel);
-    update_panels();
-    doupdate();
-
-    getch();
-    top_panel(objects->treePanel);
-    update_panels();
-    doupdate();
+/* Print the command line help menu outside of curses */
+void printHelp() {
+    printf("\n");
+    printf("cTree - a tree generator written in C\n");
+    printf("\n");
+    printf("Usage: ctree [OPTIONS]\n");
+    printf("Example: ctree -l 20 -i -d\n");
+    printf("\n");
+    printf("Options:\n");
+    printf("    -h: Show help menu\n");
+    printf("    -d: Show tree seed number (debug information)\n");
+    printf("    -s: Supply a seed number to the randomizer\n");
+    printf("    -l: Watch the tree growth LIVE, with [l] millseconds between each character\n");
+    printf("    -i: Infinitely generate trees (good for wallpaper!)\n");
+    printf("    -w: Wait time in [w] millseconds between each tree in [i] infinite tree growth\n");
+    printf("\n");
+    printf("Examples:\n");
+    printf("    ctree\n");
+    printf("        (grows one singular random tree)\n");
+    printf("    ctree -s 1234567 -d\n");
+    printf("        (grows a single tree from seed 1234567 and shows the seed during growth\n");
+    printf("    ctree -i -l 20 -w 3000\n");
+    printf("        (infinitely grows trees live, one character every 20ms, with 3 seconds between each tree)");
+    printf("\n\n");
 }
 
 /* Retrieve the appropriate character from the branch type */

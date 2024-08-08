@@ -89,6 +89,6 @@ void grow(WINDOW *win, struct branch *branch, int live, long sleep);
 // debug functions
 void makeBoxes(struct ncursesObjects *objects);
 void printTimeSeed(struct ncursesObjects *objects, time_t seed);
-void printHelp(struct ncursesObjects *objects);
+void printHelp();
 
 #endif
